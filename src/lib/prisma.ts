@@ -1,17 +1,15 @@
 import { PrismaClient } from "@prisma/client";
 import { PrismaLibSql } from "@prisma/adapter-libsql";
-import { createClient } from "@libsql/client";
 
 const globalForPrisma = globalThis as unknown as { prisma: PrismaClient };
 
 function createPrismaClient() {
   // En production (Vercel) ou si TURSO_DATABASE_URL est défini, utiliser Turso
   if (process.env.TURSO_DATABASE_URL) {
-    const libsql = createClient({
-      url: process.env.TURSO_DATABASE_URL,
+    const adapter = new PrismaLibSql({
+      url: process.env.TURSO_DATABASE_URL!,
       authToken: process.env.TURSO_AUTH_TOKEN,
     });
-    const adapter = new PrismaLibSql(libsql);
     return new PrismaClient({ adapter } as any);
   }
   // En local, utiliser SQLite classique

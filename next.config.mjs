@@ -9,9 +9,8 @@ const nextConfig = {
     serverActions: {
       bodySizeLimit: '500mb',
     },
+    serverComponentsExternalPackages: ['@libsql/client'],
   },
-  // Nécessaire pour Cloudinary/Turso sur Vercel
-  serverExternalPackages: ['@libsql/client'],
 };
 
 export default nextConfig;

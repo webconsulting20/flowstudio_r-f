@@ -41,6 +41,73 @@ export function FileUpload({
     setFileName(file.name);
     setProgress(0);
 
+    try {
+      // 1. Obtenir la signature Cloudinary depuis notre API
+      const folder = type === "video" ? "videos" : "thumbnails";
+      const sigRes = await fetch("/api/upload-signature", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ folder }),
+      });
+
+      if (!sigRes.ok) {
+        // Fallback : upload via notre API (dev local)
+        await uploadViaApi(file);
+        return;
+      }
+
+      const { signature, timestamp, cloudName, apiKey, folder: cloudFolder } = await sigRes.json();
+
+      // 2. Upload directement vers Cloudinary depuis le navigateur
+      const isVideo = type === "video" || file.type.startsWith("video/");
+      const resourceType = isVideo ? "video" : "image";
+
+      const formData = new FormData();
+      formData.append("file", file);
+      formData.append("signature", signature);
+      formData.append("timestamp", String(timestamp));
+      formData.append("api_key", apiKey);
+      formData.append("folder", cloudFolder);
+
+      const xhr = new XMLHttpRequest();
+      xhr.open("POST", `https://api.cloudinary.com/v1_1/${cloudName}/${resourceType}/upload`);
+
+      xhr.upload.onprogress = (e) => {
+        if (e.lengthComputable) {
+          const pct = Math.round((e.loaded / e.total) * 100);
+          setProgress(pct);
+        }
+      };
+
+      xhr.onload = () => {
+        if (xhr.status === 200) {
+          const result = JSON.parse(xhr.responseText);
+          setProgress(100);
+          onUploaded(result.secure_url);
+          setTimeout(() => setUploading(false), 500);
+        } else {
+          alert("Erreur lors de l'upload vers Cloudinary");
+          setUploading(false);
+          setProgress(0);
+        }
+      };
+
+      xhr.onerror = () => {
+        alert("Erreur réseau lors de l'upload");
+        setUploading(false);
+        setProgress(0);
+      };
+
+      xhr.send(formData);
+    } catch {
+      alert("Erreur lors de l'upload");
+      setUploading(false);
+      setProgress(0);
+    }
+  }
+
+  // Fallback pour le développement local (sans Cloudinary)
+  async function uploadViaApi(file: File) {
     const formData = new FormData();
     formData.append("file", file);
     formData.append("type", type);
@@ -64,10 +131,7 @@ export function FileUpload({
       const { url } = await res.json();
       setProgress(100);
       onUploaded(url);
-
-      setTimeout(() => {
-        setUploading(false);
-      }, 500);
+      setTimeout(() => setUploading(false), 500);
     } catch {
       clearInterval(progressInterval);
       alert("Erreur réseau lors de l'upload");

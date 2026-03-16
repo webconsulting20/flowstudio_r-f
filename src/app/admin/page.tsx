@@ -207,8 +207,8 @@ export default function AdminPage() {
                           {video.subcategory && ` · ${getSubcategoryLabel(video.category, video.subcategory)}`}
                         </span>
                       </div>
-                      <h3 className="text-white font-semibold text-lg leading-tight">{video.title}</h3>
-                      <p className="text-white/80 text-sm mt-1">{video.client}</p>
+                      <h3 className="text-white font-semibold text-lg leading-tight">{video.client}</h3>
+                      <p className="text-white/80 text-sm mt-1">{video.title}</p>
                     </div>
 
                     {/* Admin overlay — top right actions */}

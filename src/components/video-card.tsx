@@ -57,8 +57,8 @@ export function VideoCard({ id, title, client, category, subcategory, thumbnailU
               {subcategory && ` · ${getSubcategoryLabel(category, subcategory)}`}
             </span>
           </div>
-          <h3 className={`text-white font-semibold leading-tight ${isMarketing ? "text-sm" : "text-lg"}`}>{title}</h3>
-          <p className={`text-white/80 mt-1 ${isMarketing ? "text-xs" : "text-sm"}`}>{client}</p>
+          <h3 className={`text-white font-semibold leading-tight ${isMarketing ? "text-sm" : "text-lg"}`}>{client}</h3>
+          <p className={`text-white/80 mt-1 ${isMarketing ? "text-xs" : "text-sm"}`}>{title}</p>
         </div>
       </div>
     </a>

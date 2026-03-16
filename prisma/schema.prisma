@@ -1,0 +1,41 @@
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["driverAdapters"]
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./placeholder.db"
+}
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  password  String
+  name      String
+  role      String   @default("viewer") // "admin" | "viewer"
+  createdAt DateTime @default(now())
+}
+
+model Video {
+  id           String   @id @default(cuid())
+  title        String
+  client       String
+  description  String   @default("")
+  category     String   // "motion-design" | "filme" | "marketing-digital" | "site-web"
+  subcategory  String   @default("") // sous-catégorie optionnelle
+  thumbnailUrl String
+  videoUrl     String   @default("")
+  imageUrls    String   @default("[]") // JSON array of image URLs
+  sortOrder    Int      @default(0)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+model SiteSettings {
+  id          String @id @default("main")
+  siteTitle   String @default("FLOW STUDIO")
+  subtitle    String @default("NOS RÉALISATIONS")
+  logoUrl     String @default("")
+  footerText  String @default("Flow Studio. Tous droits réservés.")
+}

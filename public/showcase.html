@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Flow Studio — Nos Réalisations</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwindcss.config = {
+      theme: {
+        extend: {
+          colors: {
+            zinc: {
+              50:'#fafafa',100:'#f4f4f5',200:'#e4e4e7',300:'#d4d4d8',
+              400:'#a1a1aa',500:'#71717a',600:'#52525b',700:'#3f3f46',
+              800:'#27272a',900:'#18181b',950:'#09090b',
+            },
+          },
+        },
+      },
+    }
+  </script>
+  <style>
+    body { background: #09090b; color: #f4f4f5; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
+    .glass { background: rgba(255,255,255,0.03); backdrop-filter: blur(20px); border: 1px solid rgba(255,255,255,0.06); }
+    .card:hover img { transform: scale(1.05); }
+    .card:hover .overlay { opacity: 0.9; }
+    .card:hover .play-btn { opacity: 1; }
+    @keyframes fadeIn { from { opacity:0; transform:translateY(8px); } to { opacity:1; transform:translateY(0); } }
+    .fade-in { animation: fadeIn 0.5s ease-out; }
+  </style>
+</head>
+<body class="antialiased">
+  <!-- Nav -->
+  <nav class="sticky top-0 z-50 glass">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between h-16">
+      <div class="flex items-center gap-3">
+        <div class="w-8 h-8 rounded-lg" style="background: linear-gradient(135deg, #10b981, #1e40af, #ef4444)"></div>
+        <span class="text-lg font-bold tracking-widest uppercase">Flow Studio</span>
+      </div>
+      <span class="text-sm text-zinc-500">Portfolio</span>
+    </div>
+  </nav>
+
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16">
+    <!-- Hero -->
+    <div class="mb-14 fade-in">
+      <h1 class="text-5xl sm:text-6xl lg:text-7xl font-bold tracking-tight leading-none">FLOW STUDIO</h1>
+      <h2 class="text-2xl sm:text-3xl font-light tracking-wide text-zinc-400 mt-3">NOS RÉALISATIONS</h2>
+    </div>
+
+    <!-- Filters -->
+    <div class="flex flex-wrap gap-2 mb-10" id="filters">
+      <button onclick="filter(null)" class="filter-btn active px-4 py-2 rounded-full text-sm font-medium bg-white text-zinc-900 transition">Toutes</button>
+      <button onclick="filter('motion-design')" class="filter-btn px-4 py-2 rounded-full text-sm font-medium bg-white/5 text-zinc-500 border border-white/10 transition hover:text-white flex items-center gap-2">
+        <div class="w-1.5 h-1.5 rounded-full bg-emerald-500"></div>Motion Design
+      </button>
+      <button onclick="filter('filme')" class="filter-btn px-4 py-2 rounded-full text-sm font-medium bg-white/5 text-zinc-500 border border-white/10 transition hover:text-white flex items-center gap-2">
+        <div class="w-1.5 h-1.5 rounded-full bg-blue-600"></div>Filmé
+      </button>
+      <button onclick="filter('marketing-digital')" class="filter-btn px-4 py-2 rounded-full text-sm font-medium bg-white/5 text-zinc-500 border border-white/10 transition hover:text-white flex items-center gap-2">
+        <div class="w-1.5 h-1.5 rounded-full bg-red-500"></div>Marketing Digital
+      </button>
+      <button onclick="filter('site-web')" class="filter-btn px-4 py-2 rounded-full text-sm font-medium bg-white/5 text-zinc-500 border border-white/10 transition hover:text-white flex items-center gap-2">
+        <div class="w-1.5 h-1.5 rounded-full bg-yellow-500"></div>Site Web
+      </button>
+    </div>
+
+    <!-- Grid -->
+    <div id="grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+
+    <p id="empty" class="hidden text-center py-24 text-zinc-600 text-lg">Aucune référence trouvée</p>
+  </main>
+
+  <footer class="border-t border-white/5 py-8 mt-16">
+    <div class="max-w-7xl mx-auto px-4 text-center text-xs text-zinc-700 tracking-wider uppercase">
+      &copy; 2026 Flow Studio. Tous droits réservés.
+    </div>
+  </footer>
+
+  <!-- Modal -->
+  <div id="modal" class="fixed inset-0 z-50 hidden items-center justify-center p-4 bg-black/80 backdrop-blur-sm" onclick="closeModal()">
+    <div class="w-full max-w-5xl" onclick="event.stopPropagation()">
+      <div class="flex items-center justify-between mb-4">
+        <div>
+          <h3 id="modal-title" class="text-lg font-semibold"></h3>
+          <p id="modal-client" class="text-sm text-zinc-500"></p>
+        </div>
+        <button onclick="closeModal()" class="p-2 text-zinc-400 hover:text-white hover:bg-white/10 rounded-lg transition">&times;</button>
+      </div>
+      <div id="modal-content"></div>
+      <p id="modal-desc" class="mt-6 text-zinc-400 text-sm leading-relaxed"></p>
+    </div>
+  </div>
+
+  <script>
+    const COLORS = {
+      'motion-design':  { text:'text-emerald-400', dot:'bg-emerald-500', bg:'bg-emerald-500/15', border:'border-emerald-500/30', solid:'bg-emerald-600' },
+      'filme':          { text:'text-blue-400',    dot:'bg-blue-600',    bg:'bg-blue-800/25',    border:'border-blue-700/30',   solid:'bg-blue-800'    },
+      'marketing-digital':{ text:'text-red-400',   dot:'bg-red-500',     bg:'bg-red-500/15',     border:'border-red-500/30',    solid:'bg-red-600'     },
+      'site-web':       { text:'text-yellow-400',  dot:'bg-yellow-500',  bg:'bg-yellow-500/15',  border:'border-yellow-500/30', solid:'bg-yellow-500'  },
+    };
+    const LABELS = {'motion-design':'Motion Design','filme':'Filmé','marketing-digital':'Marketing Digital','site-web':'Site Web'};
+    let videos = [];
+    let activeFilter = null;
+
+    async function loadVideos() {
+      try {
+        const r = await fetch('/api/videos');
+        videos = await r.json();
+      } catch {
+        videos = [];
+      }
+      render();
+    }
+
+    function filter(cat) {
+      activeFilter = cat;
+      document.querySelectorAll('.filter-btn').forEach(b => {
+        b.classList.remove('active','bg-white','text-zinc-900','bg-emerald-600','bg-blue-800','bg-red-600','bg-yellow-500');
+        b.classList.add('bg-white/5','text-zinc-500');
+      });
+      const btns = document.querySelectorAll('.filter-btn');
+      const idx = cat === null ? 0 : ['motion-design','filme','marketing-digital','site-web'].indexOf(cat) + 1;
+      const btn = btns[idx];
+      btn.classList.remove('bg-white/5','text-zinc-500');
+      if (cat === null) { btn.classList.add('bg-white','text-zinc-900'); }
+      else { btn.classList.add(COLORS[cat].solid,'text-white'); }
+      render();
+    }
+
+    function render() {
+      const filtered = activeFilter ? videos.filter(v => v.category === activeFilter) : videos;
+      const grid = document.getElementById('grid');
+      const empty = document.getElementById('empty');
+      if (filtered.length === 0) { grid.innerHTML = ''; empty.classList.remove('hidden'); return; }
+      empty.classList.add('hidden');
+      grid.innerHTML = filtered.map((v,i) => {
+        const c = COLORS[v.category] || COLORS['motion-design'];
+        return `<div class="card fade-in cursor-pointer" style="animation-delay:${i*50}ms" onclick='openModal(${JSON.stringify(v).replace(/'/g,"&#39;")})'>
+          <div class="relative aspect-video rounded-2xl overflow-hidden glass" style="border:1px solid rgba(255,255,255,0.08)">
+            <img src="${v.thumbnailUrl}" alt="${v.title}" class="absolute inset-0 w-full h-full object-cover transition-transform duration-700" />
+            <div class="overlay absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent opacity-70 transition-opacity duration-500"></div>
+            <div class="play-btn absolute inset-0 flex items-center justify-center opacity-0 transition-all duration-500">
+              <div class="w-14 h-14 rounded-full ${c.bg} backdrop-blur-md flex items-center justify-center border ${c.border}">
+                <svg class="${c.text} w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+              </div>
+            </div>
+            <div class="absolute bottom-0 left-0 right-0 p-5">
+              <div class="flex items-center gap-2 mb-2.5">
+                <div class="w-1.5 h-1.5 rounded-full ${c.dot}"></div>
+                <span class="${c.text} text-xs font-medium uppercase tracking-wider">${LABELS[v.category]||v.category}</span>
+              </div>
+              <h3 class="text-white font-semibold text-lg leading-tight">${v.title}</h3>
+              <p class="text-zinc-400 text-sm mt-1">${v.client}</p>
+            </div>
+          </div>
+        </div>`;
+      }).join('');
+    }
+
+    function openModal(v) {
+      document.getElementById('modal-title').textContent = v.title;
+      document.getElementById('modal-client').textContent = v.client;
+      document.getElementById('modal-desc').textContent = v.description || '';
+      const mc = document.getElementById('modal-content');
+      const imgs = JSON.parse(v.imageUrls || '[]');
+      if (v.videoUrl) {
+        mc.innerHTML = `<div class="relative aspect-video rounded-2xl overflow-hidden bg-black"><video controls class="absolute inset-0 w-full h-full" src="${v.videoUrl}" playsinline></video></div>`;
+      } else if (v.category === 'site-web' && imgs.length > 0) {
+        mc.innerHTML = `<div class="rounded-xl overflow-hidden"><img src="${imgs[0]}" class="w-full h-auto" /></div>`;
+      } else if (imgs.length > 0) {
+        mc.innerHTML = `<div class="grid grid-cols-2 md:grid-cols-4 gap-3">${imgs.map(u=>`<div class="relative aspect-[4/5] rounded-xl overflow-hidden"><img src="${u}" class="absolute inset-0 w-full h-full object-cover"/></div>`).join('')}</div>`;
+      } else {
+        mc.innerHTML = '<p class="text-zinc-500 text-center py-8">Aucun contenu</p>';
+      }
+      const m = document.getElementById('modal');
+      m.classList.remove('hidden');
+      m.classList.add('flex');
+    }
+
+    function closeModal() {
+      const m = document.getElementById('modal');
+      m.classList.add('hidden');
+      m.classList.remove('flex');
+      // Stop any playing videos
+      m.querySelectorAll('video').forEach(v => v.pause());
+    }
+
+    document.addEventListener('keydown', e => { if(e.key==='Escape') closeModal(); });
+    loadVideos();
+  </script>
+</body>
+</html>

@@ -3,7 +3,7 @@ import { notFound } from "next/navigation";
 import { Navbar } from "@/components/navbar";
 import { VideoPlayer } from "@/components/video-player";
 import { getCategoryLabel, isMarketingDigital, isSiteWeb, getSubcategoryLabel } from "@/lib/categories";
-import { Calendar, Tag, User } from "lucide-react";
+import { Calendar, Tag } from "lucide-react";
 import { BackButton } from "@/components/back-button";
 
 export default async function VideoDetailPage({ params }: { params: { id: string } }) {
@@ -69,10 +69,6 @@ export default async function VideoDetailPage({ params }: { params: { id: string
           </div>
 
           <div className="flex flex-wrap gap-6 text-sm text-zinc-500 dark:text-zinc-400">
-            <div className="flex items-center gap-2">
-              <User size={16} />
-              <span>{video.title}</span>
-            </div>
             <div className="flex items-center gap-2">
               <Tag size={16} />
               <span>

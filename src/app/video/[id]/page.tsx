@@ -19,12 +19,12 @@ export default async function VideoDetailPage({ params }: { params: { id: string
     <div className="min-h-screen bg-white dark:bg-zinc-950">
       <Navbar />
 
-      <main className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <BackButton />
 
         {/* Content display based on category */}
         {isMarketing && images.length > 0 ? (
-          <div className="grid grid-cols-4 gap-3 sm:gap-4">
+          <div className="grid grid-cols-4 gap-4 sm:gap-6">
             {images.map((url, i) => (
               <div key={i} className="relative aspect-[4/5] rounded-2xl overflow-hidden border border-zinc-200 dark:border-white/[0.06] bg-zinc-50 dark:bg-white/[0.03]">
                 <img

@@ -24,7 +24,7 @@ export default async function VideoDetailPage({ params }: { params: { id: string
 
         {/* Content display based on category */}
         {isMarketing && images.length > 0 ? (
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4">
+          <div className="grid grid-cols-4 gap-3 sm:gap-4">
             {images.map((url, i) => (
               <div key={i} className="relative aspect-[4/5] rounded-2xl overflow-hidden border border-zinc-200 dark:border-white/[0.06] bg-zinc-50 dark:bg-white/[0.03]">
                 <img

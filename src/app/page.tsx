@@ -159,9 +159,9 @@ export default function HomePage() {
             <p className="text-lg">Aucune référence trouvée</p>
           </div>
         ) : (
-          <div className={`grid gap-6 ${
+          <div className={`grid gap-4 ${
             activeCategory === "marketing-digital"
-              ? "grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5"
+              ? "grid-cols-2 md:grid-cols-4"
               : "grid-cols-1 md:grid-cols-2 lg:grid-cols-3"
           }`}>
             {filtered.map((video, i) => (

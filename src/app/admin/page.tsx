@@ -10,6 +10,7 @@ import Link from "next/link";
 import {
   Plus, Pencil, Trash2, Video, Play, X,
   Users, Settings, Image as ImageIcon, Globe, Search, LayoutGrid, List,
+  CheckSquare, Square, ArrowUpToLine, ArrowDownToLine,
 } from "lucide-react";
 
 interface VideoItem {
@@ -35,6 +36,8 @@ export default function AdminPage() {
   const [activeSubcategory, setActiveSubcategory] = useState<string | null>(null);
   const [search, setSearch] = useState("");
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
+  const [selectMode, setSelectMode] = useState(false);
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
 
   // Drag and drop
   const dragItem = useRef<number | null>(null);
@@ -90,6 +93,49 @@ export default function AdminPage() {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ orderedIds: newVideos.map((v) => v.id) }),
     });
+    setSaving(false);
+  }
+
+  function toggleSelect(id: string) {
+    setSelectedIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id); else next.add(id);
+      return next;
+    });
+  }
+
+  function toggleSelectAll() {
+    if (selectedIds.size === filtered.length) setSelectedIds(new Set());
+    else setSelectedIds(new Set(filtered.map((v) => v.id)));
+  }
+
+  async function deleteSelected() {
+    if (!confirm(`Supprimer ${selectedIds.size} réalisation(s) ?`)) return;
+    for (const id of selectedIds) {
+      await fetch(`/api/videos/${id}`, { method: "DELETE" });
+    }
+    setVideos((prev) => prev.filter((v) => !selectedIds.has(v.id)));
+    setSelectedIds(new Set());
+    setSelectMode(false);
+  }
+
+  async function moveSelectedToTop() {
+    const sel = videos.filter((v) => selectedIds.has(v.id));
+    const rest = videos.filter((v) => !selectedIds.has(v.id));
+    const newOrder = [...sel, ...rest];
+    setVideos(newOrder);
+    setSaving(true);
+    await fetch("/api/videos/reorder", { method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ orderedIds: newOrder.map((v) => v.id) }) });
+    setSaving(false);
+  }
+
+  async function moveSelectedToBottom() {
+    const sel = videos.filter((v) => selectedIds.has(v.id));
+    const rest = videos.filter((v) => !selectedIds.has(v.id));
+    const newOrder = [...rest, ...sel];
+    setVideos(newOrder);
+    setSaving(true);
+    await fetch("/api/videos/reorder", { method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ orderedIds: newOrder.map((v) => v.id) }) });
     setSaving(false);
   }
 
@@ -149,6 +195,13 @@ export default function AdminPage() {
               <Users size={16} />
               <span className="hidden sm:inline text-sm">Clients</span>
             </Link>
+            <button
+              onClick={() => { setSelectMode(!selectMode); setSelectedIds(new Set()); }}
+              className={`flex items-center gap-2 px-3 py-2.5 border rounded-xl transition text-sm font-medium ${selectMode ? "bg-zinc-900 dark:bg-white text-white dark:text-zinc-900 border-transparent" : "bg-zinc-50 dark:bg-white/[0.03] border-zinc-200 dark:border-white/[0.06] text-zinc-600 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-white/[0.06]"}`}
+            >
+              <CheckSquare size={16} />
+              <span className="hidden sm:inline">Sélectionner</span>
+            </button>
             <Link href="/admin/new" className="flex items-center gap-2 px-4 py-2.5 bg-zinc-900 dark:bg-white hover:bg-zinc-800 dark:hover:bg-zinc-200 text-white dark:text-zinc-900 font-semibold rounded-xl transition">
               <Plus size={18} />
               Ajouter
@@ -212,18 +265,25 @@ export default function AdminPage() {
               return (
                 <div
                   key={video.id}
-                  draggable
-                  onDragStart={() => handleDragStart(globalIndex)}
-                  onDragEnter={() => handleDragEnter(globalIndex)}
-                  onDragEnd={handleDragEnd}
+                  draggable={!selectMode}
+                  onDragStart={() => !selectMode && handleDragStart(globalIndex)}
+                  onDragEnter={() => !selectMode && handleDragEnter(globalIndex)}
+                  onDragEnd={() => !selectMode && handleDragEnd()}
                   onDragOver={(e) => e.preventDefault()}
-                  className="flex items-center gap-4 p-3 bg-zinc-50 dark:bg-white/[0.03] border border-zinc-200 dark:border-white/[0.06] rounded-xl hover:bg-zinc-100 dark:hover:bg-white/[0.06] transition cursor-grab active:cursor-grabbing group animate-fade-in"
+                  onClick={() => selectMode && toggleSelect(video.id)}
+                  className={`flex items-center gap-4 p-3 bg-zinc-50 dark:bg-white/[0.03] border rounded-xl hover:bg-zinc-100 dark:hover:bg-white/[0.06] transition group animate-fade-in ${selectMode ? "cursor-pointer" : "cursor-grab active:cursor-grabbing"} ${selectMode && selectedIds.has(video.id) ? "border-zinc-900 dark:border-white bg-zinc-100 dark:bg-white/[0.08]" : "border-zinc-200 dark:border-white/[0.06]"}`}
                   style={{ animationDelay: `${i * 20}ms` }}
                 >
-                  {/* Drag handle */}
-                  <div className="text-zinc-300 dark:text-zinc-600 group-hover:text-zinc-500 dark:group-hover:text-zinc-400 transition">
-                    <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><circle cx="5" cy="3" r="1.5" /><circle cx="11" cy="3" r="1.5" /><circle cx="5" cy="8" r="1.5" /><circle cx="11" cy="8" r="1.5" /><circle cx="5" cy="13" r="1.5" /><circle cx="11" cy="13" r="1.5" /></svg>
-                  </div>
+                  {/* Checkbox or drag handle */}
+                  {selectMode ? (
+                    <div className={`w-5 h-5 flex items-center justify-center ${selectedIds.has(video.id) ? "text-zinc-900 dark:text-white" : "text-zinc-300 dark:text-zinc-600"}`}>
+                      {selectedIds.has(video.id) ? <CheckSquare size={18} /> : <Square size={18} />}
+                    </div>
+                  ) : (
+                    <div className="text-zinc-300 dark:text-zinc-600 group-hover:text-zinc-500 dark:group-hover:text-zinc-400 transition">
+                      <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><circle cx="5" cy="3" r="1.5" /><circle cx="11" cy="3" r="1.5" /><circle cx="5" cy="8" r="1.5" /><circle cx="11" cy="8" r="1.5" /><circle cx="5" cy="13" r="1.5" /><circle cx="11" cy="13" r="1.5" /></svg>
+                    </div>
+                  )}
 
                   {/* Thumbnail */}
                   <div className={`relative ${isMarketing ? "w-12 h-14" : "w-20 h-12"} rounded-lg overflow-hidden flex-shrink-0`}>
@@ -286,14 +346,24 @@ export default function AdminPage() {
                   key={video.id}
                   className="group relative animate-fade-in"
                   style={{ animationDelay: `${i * 30}ms` }}
-                  draggable
-                  onDragStart={() => handleDragStart(globalIndex)}
-                  onDragEnter={() => handleDragEnter(globalIndex)}
-                  onDragEnd={handleDragEnd}
+                  draggable={!selectMode}
+                  onDragStart={() => !selectMode && handleDragStart(globalIndex)}
+                  onDragEnter={() => !selectMode && handleDragEnter(globalIndex)}
+                  onDragEnd={() => !selectMode && handleDragEnd()}
                   onDragOver={(e) => e.preventDefault()}
                 >
-                  <div className={`relative ${isMarketing ? "aspect-[4/5]" : "aspect-video"} rounded-2xl overflow-hidden shadow-sm hover:shadow-lg transition-shadow cursor-grab active:cursor-grabbing`}
-                    onClick={() => setPreviewVideo(video)}>
+                  {/* Checkbox overlay in select mode */}
+                  {selectMode && (
+                    <button
+                      onClick={() => toggleSelect(video.id)}
+                      className={`absolute top-2 left-2 z-20 w-6 h-6 rounded-full flex items-center justify-center shadow transition ${selectedIds.has(video.id) ? "bg-zinc-900 dark:bg-white text-white dark:text-zinc-900" : "bg-white/80 text-zinc-400"}`}
+                    >
+                      {selectedIds.has(video.id) ? <CheckSquare size={14} /> : <Square size={14} />}
+                    </button>
+                  )}
+                  <div
+                    className={`relative ${isMarketing ? "aspect-[4/5]" : "aspect-video"} rounded-2xl overflow-hidden shadow-sm hover:shadow-lg transition-shadow ${selectMode ? "cursor-pointer" : "cursor-grab active:cursor-grabbing"} ${selectMode && selectedIds.has(video.id) ? "ring-2 ring-zinc-900 dark:ring-white" : ""}`}
+                    onClick={() => selectMode ? toggleSelect(video.id) : setPreviewVideo(video)}>
                     <Image src={video.thumbnailUrl} alt={video.title} fill
                       className={`${isMarketing ? "object-contain bg-zinc-100 dark:bg-zinc-800" : "object-cover"} transition-transform duration-700 group-hover:scale-105`}
                       sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw" />
@@ -350,6 +420,32 @@ export default function AdminPage() {
           </div>
         )}
       </main>
+
+      {/* Selection action bar */}
+      {selectMode && (
+        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 flex items-center gap-2 px-4 py-3 bg-zinc-900 dark:bg-zinc-800 rounded-2xl shadow-2xl border border-white/[0.08]">
+          <button onClick={toggleSelectAll} className="flex items-center gap-2 px-3 py-1.5 text-sm text-zinc-300 hover:text-white transition">
+            {selectedIds.size === filtered.length ? <CheckSquare size={15} /> : <Square size={15} />}
+            {selectedIds.size === filtered.length ? "Tout désélect." : "Tout sélect."}
+          </button>
+          <div className="w-px h-5 bg-white/[0.1]" />
+          <span className="text-sm text-zinc-400 px-1">{selectedIds.size} sélectionné{selectedIds.size > 1 ? "s" : ""}</span>
+          <div className="w-px h-5 bg-white/[0.1]" />
+          <button onClick={moveSelectedToTop} disabled={selectedIds.size === 0} className="flex items-center gap-1.5 px-3 py-1.5 text-sm text-zinc-300 hover:text-white disabled:opacity-40 transition">
+            <ArrowUpToLine size={15} /> En haut
+          </button>
+          <button onClick={moveSelectedToBottom} disabled={selectedIds.size === 0} className="flex items-center gap-1.5 px-3 py-1.5 text-sm text-zinc-300 hover:text-white disabled:opacity-40 transition">
+            <ArrowDownToLine size={15} /> En bas
+          </button>
+          <div className="w-px h-5 bg-white/[0.1]" />
+          <button onClick={deleteSelected} disabled={selectedIds.size === 0} className="flex items-center gap-1.5 px-3 py-1.5 text-sm text-red-400 hover:text-red-300 disabled:opacity-40 transition">
+            <Trash2 size={15} /> Supprimer
+          </button>
+          <button onClick={() => { setSelectMode(false); setSelectedIds(new Set()); }} className="p-1.5 text-zinc-400 hover:text-white transition">
+            <X size={16} />
+          </button>
+        </div>
+      )}
     </div>
   );
 }

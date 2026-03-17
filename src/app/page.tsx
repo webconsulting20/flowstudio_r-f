@@ -36,19 +36,15 @@ function loadFilters(): { cat: string | null; sub: string | null; q: string } {
   try {
     const urlParams = new URLSearchParams(window.location.search);
     const urlCat = urlParams.get("cat");
+    // Restaurer les filtres UNIQUEMENT si on revient d'une vidéo (URL contient ?cat=)
     if (urlCat) {
       const result = { cat: urlCat, sub: urlParams.get("sub") || null, q: urlParams.get("q") || "" };
       sessionStorage.setItem(FILTER_KEY, JSON.stringify(result));
       return result;
     }
   } catch {}
-  try {
-    const stored = sessionStorage.getItem(FILTER_KEY);
-    if (stored) {
-      const p = JSON.parse(stored);
-      return { cat: p.cat || null, sub: p.sub || null, q: p.q || "" };
-    }
-  } catch {}
+  // Pas de paramètre URL = arrivée fraîche → toujours "Toutes les réalisations"
+  try { sessionStorage.removeItem(FILTER_KEY); } catch {}
   return { cat: null, sub: null, q: "" };
 }
 

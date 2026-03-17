@@ -111,7 +111,7 @@ export default function AdminPage() {
 
   async function deleteSelected() {
     if (!confirm(`Supprimer ${selectedIds.size} réalisation(s) ?`)) return;
-    for (const id of selectedIds) {
+    for (const id of Array.from(selectedIds)) {
       await fetch(`/api/videos/${id}`, { method: "DELETE" });
     }
     setVideos((prev) => prev.filter((v) => !selectedIds.has(v.id)));

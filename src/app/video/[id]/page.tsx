@@ -3,7 +3,6 @@ import { notFound } from "next/navigation";
 import { Navbar } from "@/components/navbar";
 import { VideoPlayer } from "@/components/video-player";
 import { getCategoryLabel, isMarketingDigital, isSiteWeb, getSubcategoryLabel } from "@/lib/categories";
-import { Calendar, Tag } from "lucide-react";
 import { BackButton } from "@/components/back-button";
 
 export default async function VideoDetailPage({ params }: { params: { id: string } }) {
@@ -68,24 +67,6 @@ export default async function VideoDetailPage({ params }: { params: { id: string
             )}
           </div>
 
-          <div className="flex flex-wrap gap-6 text-sm text-zinc-500 dark:text-zinc-400">
-            <div className="flex items-center gap-2">
-              <Tag size={16} />
-              <span>
-                {getCategoryLabel(video.category)}
-                {video.subcategory && ` · ${getSubcategoryLabel(video.category, video.subcategory)}`}
-              </span>
-            </div>
-            <div className="flex items-center gap-2">
-              <Calendar size={16} />
-              <span>
-                {new Intl.DateTimeFormat("fr-FR", {
-                  year: "numeric",
-                  month: "long",
-                }).format(video.createdAt)}
-              </span>
-            </div>
-          </div>
 
           {video.description && (
             <div className="bg-zinc-50 dark:bg-white/[0.03] rounded-2xl p-6 border border-zinc-200 dark:border-white/[0.06]">

@@ -32,8 +32,8 @@ export function FileUpload({
   const [fileName, setFileName] = useState<string | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
-  const borderClass = accentColor?.border ?? "border-white/10";
-  const bgClass = accentColor?.bg ?? "bg-white/5";
+  const borderClass = accentColor?.border ?? "border-zinc-200 dark:border-white/10";
+  const bgClass = accentColor?.bg ?? "bg-zinc-50 dark:bg-white/5";
   const textClass = accentColor?.text ?? "text-zinc-400";
 
   async function handleFile(file: File) {
@@ -157,7 +157,7 @@ export function FileUpload({
 
   return (
     <div>
-      {label && <label className="block text-sm font-medium text-zinc-300 mb-2">{label}</label>}
+      {label && <label className="block text-sm font-medium text-zinc-500 dark:text-zinc-300 mb-2">{label}</label>}
       <div
         onDragOver={(e) => {
           e.preventDefault();
@@ -170,8 +170,8 @@ export function FileUpload({
           dragOver
             ? `${borderClass} ${bgClass}`
             : hasFile
-            ? `border-white/10 bg-white/5`
-            : `border-white/10 hover:border-white/20 hover:bg-white/5`
+            ? `border-zinc-200 dark:border-white/10 bg-zinc-50 dark:bg-white/5`
+            : `border-zinc-200 dark:border-white/10 hover:border-zinc-300 dark:hover:border-white/20 hover:bg-zinc-50 dark:hover:bg-white/5`
         } ${uploading ? "pointer-events-none" : ""}`}
       >
         <input
@@ -190,9 +190,9 @@ export function FileUpload({
                 <span className="truncate max-w-[200px]">{fileName}</span>
                 <span>{progress}%</span>
               </div>
-              <div className="h-1.5 bg-white/10 rounded-full overflow-hidden">
+              <div className="h-1.5 bg-zinc-200 dark:bg-white/10 rounded-full overflow-hidden">
                 <div
-                  className="h-full bg-white/60 rounded-full transition-all duration-300"
+                  className="h-full bg-zinc-400 dark:bg-white/60 rounded-full transition-all duration-300"
                   style={{ width: `${progress}%` }}
                 />
               </div>
@@ -200,9 +200,9 @@ export function FileUpload({
           </div>
         ) : hasFile ? (
           <div className="flex items-center gap-3 p-4">
-            <CheckCircle size={20} className="text-emerald-400 flex-shrink-0" />
+            <CheckCircle size={20} className="text-emerald-500 dark:text-emerald-400 flex-shrink-0" />
             <div className="flex-1 min-w-0">
-              <p className="text-sm text-zinc-300 truncate">
+              <p className="text-sm text-zinc-700 dark:text-zinc-300 truncate">
                 {fileName || currentUrl?.split("/").pop()}
               </p>
               <p className="text-xs text-zinc-500 mt-0.5">Cliquez ou glissez pour remplacer</p>
@@ -214,18 +214,18 @@ export function FileUpload({
                 onUploaded("");
                 setFileName(null);
               }}
-              className="p-1 text-zinc-500 hover:text-red-400 transition"
+              className="p-1 text-zinc-500 hover:text-red-500 dark:hover:text-red-400 transition"
             >
               <X size={16} />
             </button>
           </div>
         ) : (
           <div className="flex flex-col items-center gap-2 py-8 px-4">
-            <Upload size={24} className="text-zinc-500" />
-            <p className="text-sm text-zinc-400">
-              Glissez un fichier ici ou <span className="text-white/60">parcourir</span>
+            <Upload size={24} className="text-zinc-400 dark:text-zinc-500" />
+            <p className="text-sm text-zinc-500 dark:text-zinc-400">
+              Glissez un fichier ici ou <span className="text-zinc-700 dark:text-white/60">parcourir</span>
             </p>
-            <p className="text-xs text-zinc-600">
+            <p className="text-xs text-zinc-400 dark:text-zinc-600">
               {type === "video" ? "MP4, MOV, WebM" : "JPG, PNG, WebP"}
             </p>
           </div>
@@ -237,7 +237,7 @@ export function FileUpload({
         <img
           src={currentUrl}
           alt="Aperçu miniature"
-          className={`mt-3 w-full max-w-sm ${previewAspect} rounded-xl object-cover bg-white/5 border ${borderClass}`}
+          className={`mt-3 w-full max-w-sm ${previewAspect} rounded-xl object-cover bg-zinc-50 dark:bg-white/5 border ${borderClass}`}
           onError={(e) => {
             (e.target as HTMLImageElement).style.display = "none";
           }}

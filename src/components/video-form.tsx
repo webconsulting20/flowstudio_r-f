@@ -125,32 +125,32 @@ export function VideoForm({ initialData, videoId }: VideoFormProps) {
   );
 
   const inputClass =
-    "w-full px-4 py-3 bg-zinc-50 border border-zinc-200 rounded-xl text-zinc-900 placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-zinc-300 focus:border-transparent transition";
+    "w-full px-4 py-3 bg-zinc-50 dark:bg-white/[0.03] border border-zinc-200 dark:border-white/[0.06] rounded-xl text-zinc-900 dark:text-zinc-100 placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-zinc-300 dark:focus:ring-zinc-600 focus:border-transparent transition";
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
       <Link
         href="/admin"
-        className="inline-flex items-center gap-2 text-sm text-zinc-500 hover:text-white transition"
+        className="inline-flex items-center gap-2 text-sm text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 transition"
       >
         <ArrowLeft size={16} />
         Retour
       </Link>
 
-      <h1 className="text-3xl font-bold tracking-tight">
+      <h1 className="text-3xl font-bold tracking-tight text-zinc-900 dark:text-zinc-100">
         {isEditing ? "Modifier" : "Ajouter un contenu"}
       </h1>
 
       {error && (
-        <div className="bg-red-50 border border-red-200 text-red-600 text-sm rounded-xl px-4 py-3">
+        <div className="bg-red-50 dark:bg-red-500/10 border border-red-200 dark:border-red-500/20 text-red-600 dark:text-red-400 text-sm rounded-xl px-4 py-3">
           {error}
         </div>
       )}
 
-      <div className="bg-zinc-50 border border-zinc-200 rounded-2xl p-6 space-y-6">
+      <div className="bg-zinc-50 dark:bg-white/[0.03] border border-zinc-200 dark:border-white/[0.06] rounded-2xl p-6 space-y-6">
         {/* Category picker */}
         <div>
-          <label className="block text-sm font-medium text-zinc-500 mb-3">Catégorie</label>
+          <label className="block text-sm font-medium text-zinc-500 dark:text-zinc-400 mb-3">Catégorie</label>
           <div className="flex flex-wrap gap-2">
             {CATEGORIES.map((cat) => (
               <button
@@ -159,11 +159,11 @@ export function VideoForm({ initialData, videoId }: VideoFormProps) {
                 onClick={() => update("category", cat.slug)}
                 className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium transition border ${
                   form.category === cat.slug
-                    ? "bg-zinc-900 text-white border-transparent"
-                    : "bg-white text-zinc-500 border-zinc-200 hover:text-zinc-900"
+                    ? "bg-zinc-900 dark:bg-white text-white dark:text-zinc-900 border-transparent"
+                    : "bg-white dark:bg-white/[0.03] text-zinc-500 border-zinc-200 dark:border-white/[0.06] hover:text-zinc-900 dark:hover:text-zinc-100"
                 }`}
               >
-                <div className={`w-1.5 h-1.5 rounded-full ${form.category === cat.slug ? "bg-white" : "bg-zinc-400"}`} />
+                <div className={`w-1.5 h-1.5 rounded-full ${form.category === cat.slug ? "bg-white dark:bg-zinc-900" : "bg-zinc-400"}`} />
                 {cat.label}
               </button>
             ))}
@@ -173,7 +173,7 @@ export function VideoForm({ initialData, videoId }: VideoFormProps) {
         {/* Subcategory picker (max 2) */}
         {subcategories.length > 0 && (
           <div>
-            <label className="block text-sm font-medium text-zinc-500 mb-3">Sous-catégories <span className="text-zinc-400">(max 2)</span></label>
+            <label className="block text-sm font-medium text-zinc-500 dark:text-zinc-400 mb-3">Sous-catégories <span className="text-zinc-400">(max 2)</span></label>
             <div className="flex flex-wrap gap-2">
               {subcategories.map((sub) => {
                 const selected = form.subcategory.split(",").filter(Boolean).includes(sub.slug);
@@ -184,8 +184,8 @@ export function VideoForm({ initialData, videoId }: VideoFormProps) {
                     onClick={() => toggleSubcategory(sub.slug)}
                     className={`px-3.5 py-2 rounded-lg text-sm font-medium transition border ${
                       selected
-                        ? "bg-zinc-200 text-zinc-900 border-zinc-300"
-                        : "bg-white text-zinc-500 border-zinc-200 hover:text-zinc-900"
+                        ? "bg-zinc-200 dark:bg-white/[0.1] text-zinc-900 dark:text-zinc-100 border-zinc-300 dark:border-white/[0.15]"
+                        : "bg-white dark:bg-white/[0.03] text-zinc-500 border-zinc-200 dark:border-white/[0.06] hover:text-zinc-900 dark:hover:text-zinc-100"
                     }`}
                   >
                     {sub.label}
@@ -199,7 +199,7 @@ export function VideoForm({ initialData, videoId }: VideoFormProps) {
         {/* Title + Client */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
           <div>
-            <label className="block text-sm font-medium text-zinc-500 mb-2">Titre *</label>
+            <label className="block text-sm font-medium text-zinc-500 dark:text-zinc-400 mb-2">Titre *</label>
             <input
               type="text"
               required
@@ -210,7 +210,7 @@ export function VideoForm({ initialData, videoId }: VideoFormProps) {
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-zinc-500 mb-2">Client *</label>
+            <label className="block text-sm font-medium text-zinc-500 dark:text-zinc-400 mb-2">Client *</label>
             <input
               type="text"
               required
@@ -224,8 +224,8 @@ export function VideoForm({ initialData, videoId }: VideoFormProps) {
 
         {/* Description (optional) */}
         <div>
-          <label className="block text-sm font-medium text-zinc-500 mb-2">
-            Description <span className="text-zinc-600">(optionnel)</span>
+          <label className="block text-sm font-medium text-zinc-500 dark:text-zinc-400 mb-2">
+            Description <span className="text-zinc-600 dark:text-zinc-500">(optionnel)</span>
           </label>
           <textarea
             rows={3}
@@ -238,7 +238,7 @@ export function VideoForm({ initialData, videoId }: VideoFormProps) {
 
         {/* Thumbnail — vertical for Marketing, horizontal for others */}
         <div>
-          <label className="block text-sm font-medium text-zinc-500 mb-2">
+          <label className="block text-sm font-medium text-zinc-500 dark:text-zinc-400 mb-2">
             Miniature *
           </label>
           <FileUpload
@@ -260,7 +260,7 @@ export function VideoForm({ initialData, videoId }: VideoFormProps) {
             </label>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
               {images.map((url, i) => (
-                <div key={i} className={`relative aspect-[4/5] rounded-xl overflow-hidden border ${accentColor?.border ?? "border-white/10"} bg-white/[0.03]`}>
+                <div key={i} className={`relative aspect-[4/5] rounded-xl overflow-hidden border ${accentColor?.border ?? "border-zinc-200 dark:border-white/10"} bg-zinc-50 dark:bg-white/[0.03]`}>
                   <img src={url} alt={`Image ${i + 1}`} className="absolute inset-0 w-full h-full object-cover" />
                   <button
                     type="button"
@@ -274,7 +274,7 @@ export function VideoForm({ initialData, videoId }: VideoFormProps) {
               {images.length < 4 && (
                 <ImageUploadSlot
                   onUploaded={addImage}
-                  borderClass={accentColor?.border ?? "border-white/10"}
+                  borderClass={accentColor?.border ?? "border-zinc-200 dark:border-white/10"}
                   textClass={accentColor?.text ?? "text-zinc-400"}
                   aspectClass="aspect-[4/5]"
                 />
@@ -283,12 +283,12 @@ export function VideoForm({ initialData, videoId }: VideoFormProps) {
           </div>
         ) : isWeb ? (
           <div>
-            <label className="block text-sm font-medium text-zinc-500 mb-3">
+            <label className="block text-sm font-medium text-zinc-500 dark:text-zinc-400 mb-3">
               Images du site ({images.length}/4) * <span className="text-zinc-400">(format horizontal)</span>
             </label>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
               {images.map((url, i) => (
-                <div key={i} className={`relative aspect-video rounded-xl overflow-hidden border ${accentColor?.border ?? "border-zinc-200"} bg-zinc-50`}>
+                <div key={i} className={`relative aspect-video rounded-xl overflow-hidden border ${accentColor?.border ?? "border-zinc-200 dark:border-white/[0.06]"} bg-zinc-50 dark:bg-white/[0.03]`}>
                   <img src={url} alt={`Image ${i + 1}`} className="absolute inset-0 w-full h-full object-cover" />
                   <button
                     type="button"
@@ -302,7 +302,7 @@ export function VideoForm({ initialData, videoId }: VideoFormProps) {
               {images.length < 4 && (
                 <ImageUploadSlot
                   onUploaded={addImage}
-                  borderClass={accentColor?.border ?? "border-zinc-200"}
+                  borderClass={accentColor?.border ?? "border-zinc-200 dark:border-white/[0.06]"}
                   textClass={accentColor?.text ?? "text-zinc-400"}
                   aspectClass="aspect-video"
                 />
@@ -328,7 +328,7 @@ export function VideoForm({ initialData, videoId }: VideoFormProps) {
                 <button
                   type="button"
                   onClick={() => setShowVideoPreview(!showVideoPreview)}
-                  className="flex items-center gap-1.5 text-xs text-zinc-500 hover:text-white transition mb-2"
+                  className="flex items-center gap-1.5 text-xs text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 transition mb-2"
                 >
                   {showVideoPreview ? <EyeOff size={14} /> : <Play size={14} />}
                   {showVideoPreview ? "Masquer l'aperçu" : "Prévisualiser la vidéo"}
@@ -344,10 +344,10 @@ export function VideoForm({ initialData, videoId }: VideoFormProps) {
         <button
           type="submit"
           disabled={saving || !canSubmit}
-          className="flex items-center gap-2 px-6 py-3 bg-zinc-900 hover:bg-zinc-800 disabled:opacity-40 disabled:cursor-not-allowed text-white font-semibold rounded-xl transition"
+          className="flex items-center gap-2 px-6 py-3 bg-zinc-900 dark:bg-white hover:bg-zinc-800 dark:hover:bg-zinc-200 disabled:opacity-40 disabled:cursor-not-allowed text-white dark:text-zinc-900 font-semibold rounded-xl transition"
         >
           {saving ? (
-            <div className="w-5 h-5 border-2 border-zinc-300 border-t-zinc-900 rounded-full animate-spin" />
+            <div className="w-5 h-5 border-2 border-zinc-300 dark:border-zinc-600 border-t-zinc-900 dark:border-t-white rounded-full animate-spin" />
           ) : (
             <Save size={18} />
           )}
@@ -393,14 +393,14 @@ function ImageUploadSlot({
   }
 
   return (
-    <label className={`relative ${aspectClass} rounded-xl border-2 border-dashed ${borderClass} flex flex-col items-center justify-center gap-2 cursor-pointer hover:bg-white/[0.03] transition`}>
+    <label className={`relative ${aspectClass} rounded-xl border-2 border-dashed ${borderClass} flex flex-col items-center justify-center gap-2 cursor-pointer hover:bg-zinc-100 dark:hover:bg-white/[0.03] transition`}>
       <input type="file" accept="image/*" onChange={handleFile} className="hidden" />
       {uploading ? (
         <div className="w-6 h-6 border-2 border-zinc-600 border-t-white rounded-full animate-spin" />
       ) : (
         <>
           <Plus size={20} className={textClass} />
-          <span className="text-xs text-zinc-600">Ajouter</span>
+          <span className="text-xs text-zinc-600 dark:text-zinc-400">Ajouter</span>
         </>
       )}
     </label>

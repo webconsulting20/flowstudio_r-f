@@ -112,13 +112,13 @@ export default function HomePage() {
   });
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-white dark:bg-zinc-950">
       <Navbar />
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16">
         {/* Hero */}
         <div className="mb-14 animate-fade-in">
-          <h1 className="text-5xl sm:text-6xl lg:text-7xl font-bold tracking-tight leading-none text-zinc-900">
+          <h1 className="text-5xl sm:text-6xl lg:text-7xl font-bold tracking-tight leading-none text-zinc-900 dark:text-zinc-100">
             {settings.siteTitle}
           </h1>
           <h2 className="text-2xl sm:text-3xl font-light tracking-wide text-zinc-400 mt-3">
@@ -142,7 +142,7 @@ export default function HomePage() {
               placeholder="Rechercher..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="pl-9 pr-4 py-2.5 bg-zinc-50 border border-zinc-200 rounded-xl text-sm text-zinc-900 placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-zinc-300 focus:border-transparent transition w-full sm:w-56"
+              className="pl-9 pr-4 py-2.5 bg-zinc-50 dark:bg-white/[0.03] border border-zinc-200 dark:border-white/[0.06] rounded-xl text-sm text-zinc-900 dark:text-zinc-100 placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-zinc-300 dark:focus:ring-zinc-600 focus:border-transparent transition w-full sm:w-56"
             />
           </div>
         </div>
@@ -151,7 +151,7 @@ export default function HomePage() {
         {loading || !mounted ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {[...Array(6)].map((_, i) => (
-              <div key={i} className="aspect-video rounded-2xl bg-zinc-100 animate-pulse" />
+              <div key={i} className="aspect-video rounded-2xl bg-zinc-100 dark:bg-white/[0.03] animate-pulse" />
             ))}
           </div>
         ) : filtered.length === 0 ? (
@@ -182,7 +182,7 @@ export default function HomePage() {
         )}
       </main>
 
-      <footer className="border-t border-zinc-100 py-8 mt-16">
+      <footer className="border-t border-zinc-100 dark:border-white/[0.06] py-8 mt-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center text-xs text-zinc-400 tracking-wider uppercase">
           &copy; {new Date().getFullYear()} {settings.footerText}
         </div>

@@ -50,16 +50,16 @@ export default function AdminSettingsPage() {
   }
 
   const inputClass =
-    "w-full px-4 py-3 bg-zinc-50 border border-zinc-200 rounded-xl text-zinc-900 placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-zinc-300 focus:border-transparent transition";
+    "w-full px-4 py-3 bg-zinc-50 dark:bg-white/[0.03] border border-zinc-200 dark:border-white/[0.06] rounded-xl text-zinc-900 dark:text-zinc-100 placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-zinc-300 dark:focus:ring-zinc-600 focus:border-transparent transition";
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-white">
+      <div className="min-h-screen bg-white dark:bg-zinc-950">
         <Navbar />
         <main className="max-w-3xl mx-auto px-4 py-12">
           <div className="space-y-4">
             {[...Array(4)].map((_, i) => (
-              <div key={i} className="h-20 rounded-xl bg-zinc-100 animate-pulse" />
+              <div key={i} className="h-20 rounded-xl bg-zinc-100 dark:bg-white/[0.03] animate-pulse" />
             ))}
           </div>
         </main>
@@ -68,13 +68,13 @@ export default function AdminSettingsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-white dark:bg-zinc-950">
       <Navbar />
 
       <main className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <Link
           href="/admin"
-          className="inline-flex items-center gap-2 text-sm text-zinc-400 hover:text-zinc-900 transition mb-6"
+          className="inline-flex items-center gap-2 text-sm text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 transition mb-6"
         >
           <ArrowLeft size={16} />
           Retour
@@ -82,20 +82,20 @@ export default function AdminSettingsPage() {
 
         <div className="flex items-center justify-between mb-8">
           <div>
-            <h1 className="text-3xl font-bold tracking-tight text-zinc-900">Réglages du site</h1>
+            <h1 className="text-3xl font-bold tracking-tight text-zinc-900 dark:text-zinc-100">Réglages du site</h1>
             <p className="text-zinc-400 mt-1">Personnalisez l&apos;apparence de votre portfolio</p>
           </div>
         </div>
 
         <div className="space-y-6">
           {/* Logo */}
-          <div className="bg-zinc-50 rounded-2xl p-6 border border-zinc-200">
+          <div className="bg-zinc-50 dark:bg-white/[0.03] rounded-2xl p-6 border border-zinc-200 dark:border-white/[0.06]">
             <div className="flex items-center gap-3 mb-4">
-              <div className="p-2 rounded-lg bg-zinc-200">
-                <ImageIcon size={18} className="text-zinc-600" />
+              <div className="p-2 rounded-lg bg-zinc-200 dark:bg-white/[0.06]">
+                <ImageIcon size={18} className="text-zinc-600 dark:text-zinc-400" />
               </div>
               <div>
-                <h2 className="font-semibold text-zinc-900">Logo</h2>
+                <h2 className="font-semibold text-zinc-900 dark:text-zinc-100">Logo</h2>
                 <p className="text-xs text-zinc-400">Affiché en haut à gauche de la navbar</p>
               </div>
             </div>
@@ -105,10 +105,10 @@ export default function AdminSettingsPage() {
                 <img
                   src={settings.logoUrl}
                   alt="Logo"
-                  className="h-12 w-auto object-contain bg-white rounded-lg p-1 border border-zinc-200"
+                  className="h-12 w-auto object-contain bg-white dark:bg-zinc-800 rounded-lg p-1 border border-zinc-200 dark:border-white/[0.06]"
                 />
                 <div className="flex gap-2">
-                  <label className="px-3 py-1.5 text-xs bg-zinc-200 hover:bg-zinc-300 rounded-lg cursor-pointer transition text-zinc-700">
+                  <label className="px-3 py-1.5 text-xs bg-zinc-200 dark:bg-white/[0.06] hover:bg-zinc-300 dark:hover:bg-white/[0.1] rounded-lg cursor-pointer transition text-zinc-700 dark:text-zinc-300">
                     Remplacer
                     <input
                       type="file"
@@ -130,16 +130,16 @@ export default function AdminSettingsPage() {
                   </label>
                   <button
                     onClick={() => update("logoUrl", "")}
-                    className="px-3 py-1.5 text-xs text-red-500 hover:bg-red-50 rounded-lg transition"
+                    className="px-3 py-1.5 text-xs text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 rounded-lg transition"
                   >
                     Supprimer
                   </button>
                 </div>
               </div>
             ) : (
-              <label className="flex items-center justify-center gap-2 py-8 border-2 border-dashed border-zinc-300 rounded-xl cursor-pointer hover:bg-zinc-100 transition">
+              <label className="flex items-center justify-center gap-2 py-8 border-2 border-dashed border-zinc-300 dark:border-white/[0.1] rounded-xl cursor-pointer hover:bg-zinc-100 dark:hover:bg-white/[0.03] transition">
                 <ImageIcon size={20} className="text-zinc-400" />
-                <span className="text-sm text-zinc-500">Cliquez pour uploader un logo</span>
+                <span className="text-sm text-zinc-500 dark:text-zinc-400">Cliquez pour uploader un logo</span>
                 <input
                   type="file"
                   accept="image/*"
@@ -162,13 +162,13 @@ export default function AdminSettingsPage() {
           </div>
 
           {/* Site Title */}
-          <div className="bg-zinc-50 rounded-2xl p-6 border border-zinc-200">
+          <div className="bg-zinc-50 dark:bg-white/[0.03] rounded-2xl p-6 border border-zinc-200 dark:border-white/[0.06]">
             <div className="flex items-center gap-3 mb-4">
-              <div className="p-2 rounded-lg bg-zinc-200">
-                <Type size={18} className="text-zinc-600" />
+              <div className="p-2 rounded-lg bg-zinc-200 dark:bg-white/[0.06]">
+                <Type size={18} className="text-zinc-600 dark:text-zinc-400" />
               </div>
               <div>
-                <h2 className="font-semibold text-zinc-900">Titre principal</h2>
+                <h2 className="font-semibold text-zinc-900 dark:text-zinc-100">Titre principal</h2>
                 <p className="text-xs text-zinc-400">Affiché en grand sur la page d&apos;accueil</p>
               </div>
             </div>
@@ -182,13 +182,13 @@ export default function AdminSettingsPage() {
           </div>
 
           {/* Subtitle */}
-          <div className="bg-zinc-50 rounded-2xl p-6 border border-zinc-200">
+          <div className="bg-zinc-50 dark:bg-white/[0.03] rounded-2xl p-6 border border-zinc-200 dark:border-white/[0.06]">
             <div className="flex items-center gap-3 mb-4">
-              <div className="p-2 rounded-lg bg-zinc-200">
-                <Type size={18} className="text-zinc-600" />
+              <div className="p-2 rounded-lg bg-zinc-200 dark:bg-white/[0.06]">
+                <Type size={18} className="text-zinc-600 dark:text-zinc-400" />
               </div>
               <div>
-                <h2 className="font-semibold text-zinc-900">Sous-titre</h2>
+                <h2 className="font-semibold text-zinc-900 dark:text-zinc-100">Sous-titre</h2>
                 <p className="text-xs text-zinc-400">Affiché sous le titre principal</p>
               </div>
             </div>
@@ -202,13 +202,13 @@ export default function AdminSettingsPage() {
           </div>
 
           {/* Footer */}
-          <div className="bg-zinc-50 rounded-2xl p-6 border border-zinc-200">
+          <div className="bg-zinc-50 dark:bg-white/[0.03] rounded-2xl p-6 border border-zinc-200 dark:border-white/[0.06]">
             <div className="flex items-center gap-3 mb-4">
-              <div className="p-2 rounded-lg bg-zinc-200">
-                <FileText size={18} className="text-zinc-600" />
+              <div className="p-2 rounded-lg bg-zinc-200 dark:bg-white/[0.06]">
+                <FileText size={18} className="text-zinc-600 dark:text-zinc-400" />
               </div>
               <div>
-                <h2 className="font-semibold text-zinc-900">Texte du footer</h2>
+                <h2 className="font-semibold text-zinc-900 dark:text-zinc-100">Texte du footer</h2>
                 <p className="text-xs text-zinc-400">Copyright affiché en bas de page</p>
               </div>
             </div>
@@ -224,15 +224,15 @@ export default function AdminSettingsPage() {
           {/* Save */}
           <div className="flex items-center justify-end gap-3">
             {saved && (
-              <span className="text-sm text-emerald-600 animate-fade-in">✓ Enregistré</span>
+              <span className="text-sm text-emerald-600 dark:text-emerald-400 animate-fade-in">Enregistré</span>
             )}
             <button
               onClick={handleSave}
               disabled={saving}
-              className="flex items-center gap-2 px-6 py-3 bg-zinc-900 hover:bg-zinc-800 disabled:opacity-40 text-white font-semibold rounded-xl transition"
+              className="flex items-center gap-2 px-6 py-3 bg-zinc-900 dark:bg-white hover:bg-zinc-800 dark:hover:bg-zinc-200 disabled:opacity-40 text-white dark:text-zinc-900 font-semibold rounded-xl transition"
             >
               {saving ? (
-                <div className="w-5 h-5 border-2 border-zinc-500 border-t-white rounded-full animate-spin" />
+                <div className="w-5 h-5 border-2 border-zinc-500 border-t-white dark:border-zinc-300 dark:border-t-zinc-900 rounded-full animate-spin" />
               ) : (
                 <Save size={18} />
               )}

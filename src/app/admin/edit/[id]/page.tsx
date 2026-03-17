@@ -18,13 +18,13 @@ export default function EditVideoPage({ params }: { params: { id: string } }) {
   }, [params.id]);
 
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen bg-white dark:bg-zinc-950">
       <Navbar />
       <main className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         {loading ? (
           <div className="space-y-4">
             {[...Array(5)].map((_, i) => (
-              <div key={i} className="h-14 rounded-xl bg-white/[0.03] animate-pulse" />
+              <div key={i} className="h-14 rounded-xl bg-zinc-100 dark:bg-white/[0.03] animate-pulse" />
             ))}
           </div>
         ) : data ? (

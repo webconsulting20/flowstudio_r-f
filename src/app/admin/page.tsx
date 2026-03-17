@@ -111,19 +111,19 @@ export default function AdminPage() {
   });
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-white dark:bg-zinc-950">
       <Navbar />
 
       {/* Preview Modal */}
       {previewVideo && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm" onClick={() => setPreviewVideo(null)}>
-          <div className="w-full max-w-4xl bg-white rounded-2xl p-6 shadow-2xl" onClick={(e) => e.stopPropagation()}>
+          <div className="w-full max-w-4xl bg-white dark:bg-zinc-900 rounded-2xl p-6 shadow-2xl" onClick={(e) => e.stopPropagation()}>
             <div className="flex items-center justify-between mb-4">
               <div>
-                <h3 className="text-lg font-semibold text-zinc-900">{previewVideo.title}</h3>
-                <p className="text-sm text-zinc-500">{previewVideo.client}</p>
+                <h3 className="text-lg font-semibold text-zinc-900 dark:text-zinc-100">{previewVideo.title}</h3>
+                <p className="text-sm text-zinc-500 dark:text-zinc-400">{previewVideo.client}</p>
               </div>
-              <button onClick={() => setPreviewVideo(null)} className="p-2 text-zinc-400 hover:text-zinc-900 hover:bg-zinc-100 rounded-lg transition"><X size={20} /></button>
+              <button onClick={() => setPreviewVideo(null)} className="p-2 text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 hover:bg-zinc-100 dark:hover:bg-white/[0.06] rounded-lg transition"><X size={20} /></button>
             </div>
             {renderPreviewContent(previewVideo)}
           </div>
@@ -134,22 +134,22 @@ export default function AdminPage() {
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
           <div>
-            <h1 className="text-3xl font-bold tracking-tight text-zinc-900">Administration</h1>
+            <h1 className="text-3xl font-bold tracking-tight text-zinc-900 dark:text-zinc-100">Administration</h1>
             <p className="text-zinc-400 mt-1">
               {videos.length} contenu{videos.length !== 1 ? "s" : ""}
               {saving && <span className="text-xs text-zinc-400 ml-2">Sauvegarde...</span>}
             </p>
           </div>
           <div className="flex items-center gap-2">
-            <Link href="/admin/settings" className="flex items-center gap-2 px-3 py-2.5 bg-zinc-50 border border-zinc-200 hover:bg-zinc-100 text-zinc-600 rounded-xl transition">
+            <Link href="/admin/settings" className="flex items-center gap-2 px-3 py-2.5 bg-zinc-50 dark:bg-white/[0.03] border border-zinc-200 dark:border-white/[0.06] hover:bg-zinc-100 dark:hover:bg-white/[0.06] text-zinc-600 dark:text-zinc-400 rounded-xl transition">
               <Settings size={16} />
               <span className="hidden sm:inline text-sm">Réglages</span>
             </Link>
-            <Link href="/admin/clients" className="flex items-center gap-2 px-3 py-2.5 bg-zinc-50 border border-zinc-200 hover:bg-zinc-100 text-zinc-600 rounded-xl transition">
+            <Link href="/admin/clients" className="flex items-center gap-2 px-3 py-2.5 bg-zinc-50 dark:bg-white/[0.03] border border-zinc-200 dark:border-white/[0.06] hover:bg-zinc-100 dark:hover:bg-white/[0.06] text-zinc-600 dark:text-zinc-400 rounded-xl transition">
               <Users size={16} />
               <span className="hidden sm:inline text-sm">Clients</span>
             </Link>
-            <Link href="/admin/new" className="flex items-center gap-2 px-4 py-2.5 bg-zinc-900 hover:bg-zinc-800 text-white font-semibold rounded-xl transition">
+            <Link href="/admin/new" className="flex items-center gap-2 px-4 py-2.5 bg-zinc-900 dark:bg-white hover:bg-zinc-800 dark:hover:bg-zinc-200 text-white dark:text-zinc-900 font-semibold rounded-xl transition">
               <Plus size={18} />
               Ajouter
             </Link>
@@ -166,16 +166,16 @@ export default function AdminPage() {
           />
           <div className="flex items-center gap-2">
             {/* View toggle */}
-            <div className="flex items-center bg-zinc-100 rounded-lg p-0.5 border border-zinc-200">
+            <div className="flex items-center bg-zinc-100 dark:bg-white/[0.06] rounded-lg p-0.5 border border-zinc-200 dark:border-white/[0.06]">
               <button
                 onClick={() => setViewMode("grid")}
-                className={`p-2 rounded-md transition ${viewMode === "grid" ? "bg-white shadow-sm text-zinc-900" : "text-zinc-400 hover:text-zinc-600"}`}
+                className={`p-2 rounded-md transition ${viewMode === "grid" ? "bg-white dark:bg-white/[0.1] shadow-sm text-zinc-900 dark:text-zinc-100" : "text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-300"}`}
               >
                 <LayoutGrid size={16} />
               </button>
               <button
                 onClick={() => setViewMode("list")}
-                className={`p-2 rounded-md transition ${viewMode === "list" ? "bg-white shadow-sm text-zinc-900" : "text-zinc-400 hover:text-zinc-600"}`}
+                className={`p-2 rounded-md transition ${viewMode === "list" ? "bg-white dark:bg-white/[0.1] shadow-sm text-zinc-900 dark:text-zinc-100" : "text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-300"}`}
               >
                 <List size={16} />
               </button>
@@ -183,7 +183,7 @@ export default function AdminPage() {
             <div className="relative">
               <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400" />
               <input type="text" placeholder="Rechercher..." value={search} onChange={(e) => setSearch(e.target.value)}
-                className="pl-9 pr-4 py-2.5 bg-zinc-50 border border-zinc-200 rounded-xl text-sm text-zinc-900 placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-zinc-300 transition w-full sm:w-56" />
+                className="pl-9 pr-4 py-2.5 bg-zinc-50 dark:bg-white/[0.03] border border-zinc-200 dark:border-white/[0.06] rounded-xl text-sm text-zinc-900 dark:text-zinc-100 placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-zinc-300 dark:focus:ring-zinc-600 transition w-full sm:w-56" />
             </div>
           </div>
         </div>
@@ -192,14 +192,14 @@ export default function AdminPage() {
         {loading ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {[...Array(6)].map((_, i) => (
-              <div key={i} className="aspect-video rounded-2xl bg-zinc-100 animate-pulse" />
+              <div key={i} className="aspect-video rounded-2xl bg-zinc-100 dark:bg-white/[0.03] animate-pulse" />
             ))}
           </div>
         ) : filtered.length === 0 ? (
-          <div className="text-center py-24 bg-zinc-50 rounded-2xl border border-zinc-200">
-            <Video size={48} className="mx-auto text-zinc-300 mb-4" />
+          <div className="text-center py-24 bg-zinc-50 dark:bg-white/[0.03] rounded-2xl border border-zinc-200 dark:border-white/[0.06]">
+            <Video size={48} className="mx-auto text-zinc-300 dark:text-zinc-600 mb-4" />
             <p className="text-zinc-400 text-lg">Aucun contenu</p>
-            <Link href="/admin/new" className="inline-flex items-center gap-2 mt-4 px-4 py-2.5 bg-zinc-900 hover:bg-zinc-800 text-white font-semibold rounded-xl transition">
+            <Link href="/admin/new" className="inline-flex items-center gap-2 mt-4 px-4 py-2.5 bg-zinc-900 dark:bg-white hover:bg-zinc-800 dark:hover:bg-zinc-200 text-white dark:text-zinc-900 font-semibold rounded-xl transition">
               <Plus size={16} /> Ajouter
             </Link>
           </div>
@@ -217,11 +217,11 @@ export default function AdminPage() {
                   onDragEnter={() => handleDragEnter(globalIndex)}
                   onDragEnd={handleDragEnd}
                   onDragOver={(e) => e.preventDefault()}
-                  className="flex items-center gap-4 p-3 bg-zinc-50 border border-zinc-200 rounded-xl hover:bg-zinc-100 transition cursor-grab active:cursor-grabbing group animate-fade-in"
+                  className="flex items-center gap-4 p-3 bg-zinc-50 dark:bg-white/[0.03] border border-zinc-200 dark:border-white/[0.06] rounded-xl hover:bg-zinc-100 dark:hover:bg-white/[0.06] transition cursor-grab active:cursor-grabbing group animate-fade-in"
                   style={{ animationDelay: `${i * 20}ms` }}
                 >
                   {/* Drag handle */}
-                  <div className="text-zinc-300 group-hover:text-zinc-500 transition">
+                  <div className="text-zinc-300 dark:text-zinc-600 group-hover:text-zinc-500 dark:group-hover:text-zinc-400 transition">
                     <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><circle cx="5" cy="3" r="1.5" /><circle cx="11" cy="3" r="1.5" /><circle cx="5" cy="8" r="1.5" /><circle cx="11" cy="8" r="1.5" /><circle cx="5" cy="13" r="1.5" /><circle cx="11" cy="13" r="1.5" /></svg>
                   </div>
 
@@ -232,12 +232,12 @@ export default function AdminPage() {
 
                   {/* Info */}
                   <div className="flex-1 min-w-0">
-                    <p className="font-semibold text-zinc-900 truncate">{video.client}</p>
-                    <p className="text-sm text-zinc-500 truncate">{video.title}</p>
+                    <p className="font-semibold text-zinc-900 dark:text-zinc-100 truncate">{video.client}</p>
+                    <p className="text-sm text-zinc-500 dark:text-zinc-400 truncate">{video.title}</p>
                   </div>
 
                   {/* Category */}
-                  <span className="hidden md:inline-block px-2.5 py-1 bg-zinc-200 text-zinc-600 text-xs font-medium rounded-full">
+                  <span className="hidden md:inline-block px-2.5 py-1 bg-zinc-200 dark:bg-white/[0.06] text-zinc-600 dark:text-zinc-400 text-xs font-medium rounded-full">
                     {getCategoryLabel(video.category)}
                   </span>
 
@@ -245,20 +245,20 @@ export default function AdminPage() {
                   <div className="flex items-center gap-1">
                     <button
                       onClick={() => setPreviewVideo(video)}
-                      className="p-2 text-zinc-400 hover:text-zinc-900 hover:bg-zinc-200 rounded-lg transition"
+                      className="p-2 text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 hover:bg-zinc-200 dark:hover:bg-white/[0.06] rounded-lg transition"
                     >
                       <Play size={14} />
                     </button>
                     <Link
                       href={`/admin/edit/${video.id}`}
-                      className="p-2 text-zinc-400 hover:text-zinc-900 hover:bg-zinc-200 rounded-lg transition"
+                      className="p-2 text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 hover:bg-zinc-200 dark:hover:bg-white/[0.06] rounded-lg transition"
                     >
                       <Pencil size={14} />
                     </Link>
                     <button
                       onClick={(e) => handleDelete(e, video.id, video.title)}
                       disabled={deleting === video.id}
-                      className="p-2 text-zinc-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition disabled:opacity-50"
+                      className="p-2 text-zinc-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-500/10 rounded-lg transition disabled:opacity-50"
                     >
                       <Trash2 size={14} />
                     </button>
@@ -295,7 +295,7 @@ export default function AdminPage() {
                   <div className={`relative ${isMarketing ? "aspect-[4/5]" : "aspect-video"} rounded-2xl overflow-hidden shadow-sm hover:shadow-lg transition-shadow cursor-grab active:cursor-grabbing`}
                     onClick={() => setPreviewVideo(video)}>
                     <Image src={video.thumbnailUrl} alt={video.title} fill
-                      className={`${isMarketing ? "object-contain bg-zinc-100" : "object-cover"} transition-transform duration-700 group-hover:scale-105`}
+                      className={`${isMarketing ? "object-contain bg-zinc-100 dark:bg-zinc-800" : "object-cover"} transition-transform duration-700 group-hover:scale-105`}
                       sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw" />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/10 to-transparent opacity-60 group-hover:opacity-80 transition-opacity duration-500" />
 

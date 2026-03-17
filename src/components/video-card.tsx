@@ -34,7 +34,7 @@ export function VideoCard({ id, title, client, category, subcategory, thumbnailU
           src={thumbnailUrl}
           alt={title}
           fill
-          className={`${isMarketing ? "object-contain bg-zinc-100" : "object-cover"} transition-transform duration-700 group-hover:scale-105`}
+          className={`${isMarketing ? "object-contain bg-zinc-100 dark:bg-zinc-800" : "object-cover"} transition-transform duration-700 group-hover:scale-105`}
           sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
         />
         <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/10 to-transparent opacity-60 group-hover:opacity-80 transition-opacity duration-500" />

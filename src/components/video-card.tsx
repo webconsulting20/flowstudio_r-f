@@ -31,12 +31,12 @@ export function VideoCard({ id, title, client, category, subcategory, thumbnailU
 
   return (
     <a href={href} className="group block">
-      <div className={`relative ${isMarketing ? "aspect-square" : "aspect-video"} rounded-2xl overflow-hidden glass-strong`}>
+      <div className={`relative ${isMarketing ? "aspect-[4/5]" : "aspect-video"} rounded-2xl overflow-hidden glass-strong`}>
         <Image
           src={thumbnailUrl}
           alt={title}
           fill
-          className="object-cover transition-transform duration-700 group-hover:scale-105"
+          className={`${isMarketing ? "object-contain" : "object-cover"} transition-transform duration-700 group-hover:scale-105`}
           sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
         />
         <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent opacity-70 group-hover:opacity-90 transition-opacity duration-500" />

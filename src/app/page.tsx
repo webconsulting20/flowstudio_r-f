@@ -107,7 +107,7 @@ export default function HomePage() {
 
   const filtered = videos.filter((v) => {
     const matchCategory = !activeCategory || v.category === activeCategory;
-    const matchSubcategory = !activeSubcategory || v.subcategory === activeSubcategory;
+    const matchSubcategory = !activeSubcategory || (v.subcategory && v.subcategory.split(",").map((s: string) => s.trim()).includes(activeSubcategory));
     const matchSearch =
       !search ||
       v.title.toLowerCase().includes(search.toLowerCase()) ||

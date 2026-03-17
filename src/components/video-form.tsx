@@ -63,6 +63,22 @@ export function VideoForm({ initialData, videoId }: VideoFormProps) {
     if (field === "videoUrl") setShowVideoPreview(false);
   }
 
+  function toggleSubcategory(slug: string) {
+    const current = form.subcategory ? form.subcategory.split(",").filter(Boolean) : [];
+    let next: string[];
+    if (current.includes(slug)) {
+      // Décocher
+      next = current.filter((s) => s !== slug);
+    } else if (current.length < 2) {
+      // Ajouter (max 2)
+      next = [...current, slug];
+    } else {
+      // Remplacer le dernier
+      next = [current[0], slug];
+    }
+    update("subcategory", next.join(","));
+  }
+
   function updateImages(newImages: string[]) {
     setForm((prev) => ({ ...prev, imageUrls: JSON.stringify(newImages) }));
   }
@@ -154,25 +170,28 @@ export function VideoForm({ initialData, videoId }: VideoFormProps) {
           </div>
         </div>
 
-        {/* Subcategory picker */}
+        {/* Subcategory picker (max 2) */}
         {subcategories.length > 0 && (
           <div>
-            <label className="block text-sm font-medium text-zinc-400 mb-3">Sous-catégorie</label>
+            <label className="block text-sm font-medium text-zinc-400 mb-3">Sous-catégories <span className="text-zinc-600">(max 2)</span></label>
             <div className="flex flex-wrap gap-2">
-              {subcategories.map((sub) => (
-                <button
-                  key={sub.slug}
-                  type="button"
-                  onClick={() => update("subcategory", form.subcategory === sub.slug ? "" : sub.slug)}
-                  className={`px-3.5 py-2 rounded-lg text-sm font-medium transition border ${
-                    form.subcategory === sub.slug
-                      ? `${accentColor?.bg ?? "bg-white/10"} ${accentColor?.text ?? "text-white"} ${accentColor?.border ?? "border-white/10"}`
-                      : "bg-white/[0.02] text-zinc-500 border-white/[0.06] hover:text-white"
-                  }`}
-                >
-                  {sub.label}
-                </button>
-              ))}
+              {subcategories.map((sub) => {
+                const selected = form.subcategory.split(",").filter(Boolean).includes(sub.slug);
+                return (
+                  <button
+                    key={sub.slug}
+                    type="button"
+                    onClick={() => toggleSubcategory(sub.slug)}
+                    className={`px-3.5 py-2 rounded-lg text-sm font-medium transition border ${
+                      selected
+                        ? `${accentColor?.bg ?? "bg-white/10"} ${accentColor?.text ?? "text-white"} ${accentColor?.border ?? "border-white/10"}`
+                        : "bg-white/[0.02] text-zinc-500 border-white/[0.06] hover:text-white"
+                    }`}
+                  >
+                    {sub.label}
+                  </button>
+                );
+              })}
             </div>
           </div>
         )}

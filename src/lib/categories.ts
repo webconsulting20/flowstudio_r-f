@@ -21,6 +21,7 @@ export const CATEGORIES = [
       { slug: "produit", label: "Produit" },
       { slug: "sensibilisation", label: "Sensibilisation" },
       { slug: "artistique", label: "Artistique" },
+      { slug: "visuel-anime", label: "Visuel animé" },
     ],
     color: NEUTRAL_COLOR,
   },
@@ -34,6 +35,8 @@ export const CATEGORIES = [
       { slug: "institutionnel", label: "Institutionnel" },
       { slug: "temoignage", label: "Témoignage" },
       { slug: "ia", label: "IA" },
+      { slug: "couverture-mediatique", label: "Couverture médiatique" },
+      { slug: "3d", label: "3D" },
     ],
     color: NEUTRAL_COLOR,
   },
@@ -70,8 +73,13 @@ export function getSubcategories(categorySlug: string) {
 export function getSubcategoryLabel(categorySlug: string, subcategorySlug: string): string {
   const cat = CATEGORIES.find((c) => c.slug === categorySlug);
   if (!cat) return subcategorySlug;
-  const sub = cat.subcategories.find((s) => s.slug === subcategorySlug);
-  return sub?.label ?? subcategorySlug;
+  // Support multi-subcategory (comma-separated)
+  const slugs = subcategorySlug.split(",").map((s) => s.trim()).filter(Boolean);
+  const labels = slugs.map((slug) => {
+    const sub = cat.subcategories.find((s) => s.slug === slug);
+    return sub?.label ?? slug;
+  });
+  return labels.join(" · ");
 }
 
 export function isMarketingDigital(category: string): boolean {

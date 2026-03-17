@@ -37,7 +37,7 @@ function loadFilters(): { cat: string | null; sub: string | null; q: string } {
     const urlParams = new URLSearchParams(window.location.search);
     const urlCat = urlParams.get("cat");
     // Restaurer les filtres UNIQUEMENT si on revient d'une vidéo (URL contient ?cat=)
-    if (urlCat) {
+    if (urlCat || urlParams.get("q")) {
       const result = { cat: urlCat, sub: urlParams.get("sub") || null, q: urlParams.get("q") || "" };
       sessionStorage.setItem(FILTER_KEY, JSON.stringify(result));
       return result;
@@ -175,6 +175,7 @@ export default function HomePage() {
                   thumbnailUrl={video.thumbnailUrl}
                   returnCat={activeCategory}
                   returnSub={activeSubcategory}
+                  returnSearch={search}
                 />
               </div>
             ))}

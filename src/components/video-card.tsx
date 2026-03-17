@@ -13,9 +13,10 @@ interface VideoCardProps {
   thumbnailUrl: string;
   returnCat?: string | null;
   returnSub?: string | null;
+  returnSearch?: string;
 }
 
-export function VideoCard({ id, title, client, category, subcategory, thumbnailUrl, returnCat, returnSub }: VideoCardProps) {
+export function VideoCard({ id, title, client, category, subcategory, thumbnailUrl, returnCat, returnSub, returnSearch }: VideoCardProps) {
   const isMarketing = isMarketingDigital(category);
   const isWeb = isSiteWeb(category);
 
@@ -24,6 +25,7 @@ export function VideoCard({ id, title, client, category, subcategory, thumbnailU
   const params = new URLSearchParams();
   if (returnCat) params.set("from_cat", returnCat);
   if (returnSub) params.set("from_sub", returnSub);
+  if (returnSearch) params.set("from_q", returnSearch);
   const query = params.toString();
   const href = query ? `/video/${id}?${query}` : `/video/${id}`;
 

@@ -23,33 +23,35 @@ export default async function VideoDetailPage({ params }: { params: { id: string
         <BackButton />
 
         {/* Content display based on category */}
-        {isMarketing && images.length > 0 ? (
-          <div className="flex gap-3 w-full">
-            {images.map((url, i) => (
-              <div key={i} className="relative flex-1 aspect-[3/4] rounded-2xl overflow-hidden border border-zinc-200 dark:border-white/[0.06] bg-zinc-50 dark:bg-white/[0.03]">
-                <img
-                  src={url}
-                  alt={`${video.title} - Image ${i + 1}`}
-                  className="absolute inset-0 w-full h-full object-cover"
-                />
-              </div>
-            ))}
-          </div>
-        ) : isWeb && images.length > 0 ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {images.map((url, i) => (
-              <div key={i} className="relative aspect-video rounded-2xl overflow-hidden border border-zinc-200 dark:border-white/[0.06] bg-zinc-50 dark:bg-white/[0.03]">
-                <img
-                  src={url}
-                  alt={`${video.title} - Image ${i + 1}`}
-                  className="absolute inset-0 w-full h-full object-cover"
-                />
-              </div>
-            ))}
-          </div>
-        ) : video.videoUrl ? (
-          <VideoPlayer url={video.videoUrl} title={video.title} />
-        ) : null}
+        <div className="max-w-3xl">
+          {isMarketing && images.length > 0 ? (
+            <div className="flex gap-3 w-full">
+              {images.map((url, i) => (
+                <div key={i} className="relative flex-1 aspect-[3/4] rounded-2xl overflow-hidden border border-zinc-200 dark:border-white/[0.06] bg-zinc-50 dark:bg-white/[0.03]">
+                  <img
+                    src={url}
+                    alt={`${video.title} - Image ${i + 1}`}
+                    className="absolute inset-0 w-full h-full object-cover"
+                  />
+                </div>
+              ))}
+            </div>
+          ) : isWeb && images.length > 0 ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {images.map((url, i) => (
+                <div key={i} className="relative aspect-video rounded-2xl overflow-hidden border border-zinc-200 dark:border-white/[0.06] bg-zinc-50 dark:bg-white/[0.03]">
+                  <img
+                    src={url}
+                    alt={`${video.title} - Image ${i + 1}`}
+                    className="absolute inset-0 w-full h-full object-cover"
+                  />
+                </div>
+              ))}
+            </div>
+          ) : video.videoUrl ? (
+            <VideoPlayer url={video.videoUrl} title={video.title} />
+          ) : null}
+        </div>
 
         <div className="mt-8 space-y-6 animate-fade-in">
           <div>
@@ -60,13 +62,16 @@ export default async function VideoDetailPage({ params }: { params: { id: string
                 {video.subcategory && ` · ${getSubcategoryLabel(video.category, video.subcategory)}`}
               </span>
             </div>
-            <h1 className="text-3xl sm:text-4xl font-bold tracking-tight text-zinc-900 dark:text-zinc-100">{video.title}</h1>
+            <h1 className="text-3xl sm:text-4xl font-bold tracking-tight text-zinc-900 dark:text-zinc-100">{video.client}</h1>
+            {video.title && (
+              <p className="text-lg text-zinc-500 dark:text-zinc-400 mt-1">{video.title}</p>
+            )}
           </div>
 
           <div className="flex flex-wrap gap-6 text-sm text-zinc-500 dark:text-zinc-400">
             <div className="flex items-center gap-2">
               <User size={16} />
-              <span>{video.client}</span>
+              <span>{video.title}</span>
             </div>
             <div className="flex items-center gap-2">
               <Tag size={16} />

@@ -4,14 +4,16 @@ import { ArrowLeft } from "lucide-react";
 
 export function BackButton() {
   const handleBack = () => {
-    // Lire les filtres depuis l'URL de la page vidéo (?from_cat=xxx&from_sub=yyy)
+    // Lire les filtres depuis l'URL de la page vidéo (?from_cat=xxx&from_sub=yyy&from_q=zzz)
     const urlParams = new URLSearchParams(window.location.search);
     const cat = urlParams.get("from_cat");
     const sub = urlParams.get("from_sub");
+    const q = urlParams.get("from_q");
 
     const returnParams = new URLSearchParams();
     if (cat) returnParams.set("cat", cat);
     if (sub) returnParams.set("sub", sub);
+    if (q) returnParams.set("q", q);
     const query = returnParams.toString();
     window.location.href = query ? `/?${query}` : "/";
   };

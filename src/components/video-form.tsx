@@ -84,7 +84,7 @@ export function VideoForm({ initialData, videoId }: VideoFormProps) {
   }
 
   function addImage(url: string) {
-    const maxImages = isWeb ? 1 : 4;
+    const maxImages = 4;
     if (images.length >= maxImages) return;
     updateImages([...images, url]);
   }
@@ -125,7 +125,7 @@ export function VideoForm({ initialData, videoId }: VideoFormProps) {
   );
 
   const inputClass =
-    "w-full px-4 py-3 bg-white/[0.03] border border-white/[0.06] rounded-xl text-white placeholder-zinc-600 focus:outline-none focus:ring-1 focus:ring-white/20 focus:border-transparent transition";
+    "w-full px-4 py-3 bg-zinc-50 border border-zinc-200 rounded-xl text-zinc-900 placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-zinc-300 focus:border-transparent transition";
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
@@ -142,15 +142,15 @@ export function VideoForm({ initialData, videoId }: VideoFormProps) {
       </h1>
 
       {error && (
-        <div className="bg-red-500/10 border border-red-500/20 text-red-400 text-sm rounded-xl px-4 py-3">
+        <div className="bg-red-50 border border-red-200 text-red-600 text-sm rounded-xl px-4 py-3">
           {error}
         </div>
       )}
 
-      <div className="glass rounded-2xl p-6 space-y-6">
+      <div className="bg-zinc-50 border border-zinc-200 rounded-2xl p-6 space-y-6">
         {/* Category picker */}
         <div>
-          <label className="block text-sm font-medium text-zinc-400 mb-3">Catégorie</label>
+          <label className="block text-sm font-medium text-zinc-500 mb-3">Catégorie</label>
           <div className="flex flex-wrap gap-2">
             {CATEGORIES.map((cat) => (
               <button
@@ -159,11 +159,11 @@ export function VideoForm({ initialData, videoId }: VideoFormProps) {
                 onClick={() => update("category", cat.slug)}
                 className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium transition border ${
                   form.category === cat.slug
-                    ? `${cat.color.bgSolid} text-white border-transparent`
-                    : `bg-white/[0.03] text-zinc-500 ${cat.color.border} hover:text-white`
+                    ? "bg-zinc-900 text-white border-transparent"
+                    : "bg-white text-zinc-500 border-zinc-200 hover:text-zinc-900"
                 }`}
               >
-                <div className={`w-1.5 h-1.5 rounded-full ${form.category === cat.slug ? "bg-white" : cat.color.dot}`} />
+                <div className={`w-1.5 h-1.5 rounded-full ${form.category === cat.slug ? "bg-white" : "bg-zinc-400"}`} />
                 {cat.label}
               </button>
             ))}
@@ -173,7 +173,7 @@ export function VideoForm({ initialData, videoId }: VideoFormProps) {
         {/* Subcategory picker (max 2) */}
         {subcategories.length > 0 && (
           <div>
-            <label className="block text-sm font-medium text-zinc-400 mb-3">Sous-catégories <span className="text-zinc-600">(max 2)</span></label>
+            <label className="block text-sm font-medium text-zinc-500 mb-3">Sous-catégories <span className="text-zinc-400">(max 2)</span></label>
             <div className="flex flex-wrap gap-2">
               {subcategories.map((sub) => {
                 const selected = form.subcategory.split(",").filter(Boolean).includes(sub.slug);
@@ -184,8 +184,8 @@ export function VideoForm({ initialData, videoId }: VideoFormProps) {
                     onClick={() => toggleSubcategory(sub.slug)}
                     className={`px-3.5 py-2 rounded-lg text-sm font-medium transition border ${
                       selected
-                        ? `${accentColor?.bg ?? "bg-white/10"} ${accentColor?.text ?? "text-white"} ${accentColor?.border ?? "border-white/10"}`
-                        : "bg-white/[0.02] text-zinc-500 border-white/[0.06] hover:text-white"
+                        ? "bg-zinc-200 text-zinc-900 border-zinc-300"
+                        : "bg-white text-zinc-500 border-zinc-200 hover:text-zinc-900"
                     }`}
                   >
                     {sub.label}
@@ -199,7 +199,7 @@ export function VideoForm({ initialData, videoId }: VideoFormProps) {
         {/* Title + Client */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
           <div>
-            <label className="block text-sm font-medium text-zinc-400 mb-2">Titre *</label>
+            <label className="block text-sm font-medium text-zinc-500 mb-2">Titre *</label>
             <input
               type="text"
               required
@@ -210,7 +210,7 @@ export function VideoForm({ initialData, videoId }: VideoFormProps) {
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-zinc-400 mb-2">Client *</label>
+            <label className="block text-sm font-medium text-zinc-500 mb-2">Client *</label>
             <input
               type="text"
               required
@@ -224,7 +224,7 @@ export function VideoForm({ initialData, videoId }: VideoFormProps) {
 
         {/* Description (optional) */}
         <div>
-          <label className="block text-sm font-medium text-zinc-400 mb-2">
+          <label className="block text-sm font-medium text-zinc-500 mb-2">
             Description <span className="text-zinc-600">(optionnel)</span>
           </label>
           <textarea
@@ -238,7 +238,7 @@ export function VideoForm({ initialData, videoId }: VideoFormProps) {
 
         {/* Thumbnail — vertical for Marketing, horizontal for others */}
         <div>
-          <label className="block text-sm font-medium text-zinc-400 mb-2">
+          <label className="block text-sm font-medium text-zinc-500 mb-2">
             Miniature *
           </label>
           <FileUpload
@@ -283,28 +283,31 @@ export function VideoForm({ initialData, videoId }: VideoFormProps) {
           </div>
         ) : isWeb ? (
           <div>
-            <label className="block text-sm font-medium text-zinc-400 mb-3">
-              Image du site * <span className="text-zinc-600">(format horizontal)</span>
+            <label className="block text-sm font-medium text-zinc-500 mb-3">
+              Images du site ({images.length}/4) * <span className="text-zinc-400">(format horizontal)</span>
             </label>
-            {images.length > 0 ? (
-              <div className={`relative rounded-xl overflow-hidden border ${accentColor?.border ?? "border-white/10"} bg-white/[0.03]`}>
-                <img src={images[0]} alt="Site web" className="w-full h-auto object-contain" />
-                <button
-                  type="button"
-                  onClick={() => removeImage(0)}
-                  className="absolute top-3 right-3 p-1.5 bg-black/60 rounded-full text-white hover:bg-red-500 transition"
-                >
-                  <X size={16} />
-                </button>
-              </div>
-            ) : (
-              <ImageUploadSlot
-                onUploaded={addImage}
-                borderClass={accentColor?.border ?? "border-white/10"}
-                textClass={accentColor?.text ?? "text-zinc-400"}
-                aspectClass="aspect-video"
-              />
-            )}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+              {images.map((url, i) => (
+                <div key={i} className={`relative aspect-video rounded-xl overflow-hidden border ${accentColor?.border ?? "border-zinc-200"} bg-zinc-50`}>
+                  <img src={url} alt={`Image ${i + 1}`} className="absolute inset-0 w-full h-full object-cover" />
+                  <button
+                    type="button"
+                    onClick={() => removeImage(i)}
+                    className="absolute top-2 right-2 p-1 bg-black/60 rounded-full text-white hover:bg-red-500 transition"
+                  >
+                    <X size={14} />
+                  </button>
+                </div>
+              ))}
+              {images.length < 4 && (
+                <ImageUploadSlot
+                  onUploaded={addImage}
+                  borderClass={accentColor?.border ?? "border-zinc-200"}
+                  textClass={accentColor?.text ?? "text-zinc-400"}
+                  aspectClass="aspect-video"
+                />
+              )}
+            </div>
           </div>
         ) : (
           <div>
@@ -341,7 +344,7 @@ export function VideoForm({ initialData, videoId }: VideoFormProps) {
         <button
           type="submit"
           disabled={saving || !canSubmit}
-          className="flex items-center gap-2 px-6 py-3 bg-white hover:bg-zinc-100 disabled:opacity-40 disabled:cursor-not-allowed text-zinc-900 font-semibold rounded-xl transition"
+          className="flex items-center gap-2 px-6 py-3 bg-zinc-900 hover:bg-zinc-800 disabled:opacity-40 disabled:cursor-not-allowed text-white font-semibold rounded-xl transition"
         >
           {saving ? (
             <div className="w-5 h-5 border-2 border-zinc-300 border-t-zinc-900 rounded-full animate-spin" />

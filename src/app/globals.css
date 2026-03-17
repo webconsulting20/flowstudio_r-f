@@ -4,11 +4,11 @@
 
 @layer base {
   body {
-    @apply bg-zinc-950 text-zinc-100 antialiased;
+    @apply bg-white text-zinc-900 antialiased;
   }
 
   ::selection {
-    @apply bg-white/20;
+    @apply bg-zinc-200;
   }
 
   /* Scrollbar styling */
@@ -19,21 +19,21 @@
     background: transparent;
   }
   ::-webkit-scrollbar-thumb {
-    background: rgba(255, 255, 255, 0.1);
+    background: rgba(0, 0, 0, 0.15);
     border-radius: 3px;
   }
   ::-webkit-scrollbar-thumb:hover {
-    background: rgba(255, 255, 255, 0.2);
+    background: rgba(0, 0, 0, 0.25);
   }
 }
 
 @layer utilities {
   .glass {
-    @apply bg-white/[0.03] backdrop-blur-xl border border-white/[0.06];
+    @apply bg-zinc-50 border border-zinc-200;
   }
 
   .glass-strong {
-    @apply bg-white/[0.06] backdrop-blur-xl border border-white/[0.08];
+    @apply bg-zinc-100 border border-zinc-200;
   }
 }
 

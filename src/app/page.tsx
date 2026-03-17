@@ -33,18 +33,15 @@ function saveFilters(cat: string | null, sub: string | null, q: string) {
 }
 
 function loadFilters(): { cat: string | null; sub: string | null; q: string } {
-  // Priorité 1 : lire depuis l'URL (quand on revient via le bouton retour)
   try {
     const urlParams = new URLSearchParams(window.location.search);
     const urlCat = urlParams.get("cat");
     if (urlCat) {
       const result = { cat: urlCat, sub: urlParams.get("sub") || null, q: urlParams.get("q") || "" };
-      // Synchroniser sessionStorage avec l'URL
       sessionStorage.setItem(FILTER_KEY, JSON.stringify(result));
       return result;
     }
   } catch {}
-  // Priorité 2 : lire depuis sessionStorage
   try {
     const stored = sessionStorage.getItem(FILTER_KEY);
     if (stored) {
@@ -69,7 +66,6 @@ export default function HomePage() {
     logoUrl: "",
   });
 
-  // Restaurer les filtres depuis sessionStorage après le montage (évite l'erreur d'hydratation)
   useEffect(() => {
     const saved = loadFilters();
     _setCat(saved.cat);
@@ -116,13 +112,13 @@ export default function HomePage() {
   });
 
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen bg-white">
       <Navbar />
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16">
         {/* Hero */}
         <div className="mb-14 animate-fade-in">
-          <h1 className="text-5xl sm:text-6xl lg:text-7xl font-bold tracking-tight leading-none">
+          <h1 className="text-5xl sm:text-6xl lg:text-7xl font-bold tracking-tight leading-none text-zinc-900">
             {settings.siteTitle}
           </h1>
           <h2 className="text-2xl sm:text-3xl font-light tracking-wide text-zinc-400 mt-3">
@@ -140,13 +136,13 @@ export default function HomePage() {
           />
 
           <div className="relative">
-            <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-600" />
+            <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400" />
             <input
               type="text"
               placeholder="Rechercher..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="pl-9 pr-4 py-2.5 bg-white/[0.03] border border-white/[0.06] rounded-xl text-sm text-white placeholder-zinc-600 focus:outline-none focus:ring-1 focus:ring-white/20 focus:border-transparent transition w-full sm:w-56"
+              className="pl-9 pr-4 py-2.5 bg-zinc-50 border border-zinc-200 rounded-xl text-sm text-zinc-900 placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-zinc-300 focus:border-transparent transition w-full sm:w-56"
             />
           </div>
         </div>
@@ -155,11 +151,11 @@ export default function HomePage() {
         {loading || !mounted ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {[...Array(6)].map((_, i) => (
-              <div key={i} className="aspect-video rounded-2xl bg-white/[0.03] animate-pulse" />
+              <div key={i} className="aspect-video rounded-2xl bg-zinc-100 animate-pulse" />
             ))}
           </div>
         ) : filtered.length === 0 ? (
-          <div className="text-center py-24 text-zinc-600">
+          <div className="text-center py-24 text-zinc-400">
             <p className="text-lg">Aucune référence trouvée</p>
           </div>
         ) : (
@@ -186,8 +182,8 @@ export default function HomePage() {
         )}
       </main>
 
-      <footer className="border-t border-white/[0.04] py-8 mt-16">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center text-xs text-zinc-700 tracking-wider uppercase">
+      <footer className="border-t border-zinc-100 py-8 mt-16">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center text-xs text-zinc-400 tracking-wider uppercase">
           &copy; {new Date().getFullYear()} {settings.footerText}
         </div>
       </footer>

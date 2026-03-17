@@ -1,13 +1,13 @@
 const NEUTRAL_COLOR = {
-  bg: "bg-white/[0.06]",
+  bg: "bg-zinc-100",
   bgSolid: "bg-zinc-800",
   bgHover: "hover:bg-zinc-700",
-  text: "text-zinc-400",
-  textSolid: "text-zinc-300",
-  border: "border-white/[0.08]",
-  badge: "bg-zinc-800/80",
-  ring: "ring-zinc-700",
-  gradient: "from-zinc-900/40 to-transparent",
+  text: "text-zinc-600",
+  textSolid: "text-zinc-700",
+  border: "border-zinc-200",
+  badge: "bg-zinc-100",
+  ring: "ring-zinc-300",
+  gradient: "from-zinc-100 to-transparent",
   dot: "bg-zinc-400",
 } as const;
 

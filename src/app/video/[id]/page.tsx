@@ -2,8 +2,8 @@ import { prisma } from "@/lib/prisma";
 import { notFound } from "next/navigation";
 import { Navbar } from "@/components/navbar";
 import { VideoPlayer } from "@/components/video-player";
-import { getCategoryLabel, getCategoryColor, isMarketingDigital, isSiteWeb, getSubcategoryLabel } from "@/lib/categories";
-import { ArrowLeft, Calendar, Tag, User } from "lucide-react";
+import { getCategoryLabel, isMarketingDigital, isSiteWeb, getSubcategoryLabel } from "@/lib/categories";
+import { Calendar, Tag, User } from "lucide-react";
 import { BackButton } from "@/components/back-button";
 
 export default async function VideoDetailPage({ params }: { params: { id: string } }) {
@@ -11,13 +11,12 @@ export default async function VideoDetailPage({ params }: { params: { id: string
 
   if (!video) notFound();
 
-  const color = getCategoryColor(video.category);
   const isMarketing = isMarketingDigital(video.category);
   const isWeb = isSiteWeb(video.category);
   const images: string[] = (isMarketing || isWeb) ? JSON.parse(video.imageUrls || "[]") : [];
 
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen bg-white">
       <Navbar />
 
       <main className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
@@ -27,7 +26,7 @@ export default async function VideoDetailPage({ params }: { params: { id: string
         {isMarketing && images.length > 0 ? (
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4">
             {images.map((url, i) => (
-              <div key={i} className={`relative aspect-[4/5] rounded-2xl overflow-hidden border ${color.border} bg-white/[0.03]`}>
+              <div key={i} className="relative aspect-[4/5] rounded-2xl overflow-hidden border border-zinc-200 bg-zinc-50">
                 <img
                   src={url}
                   alt={`${video.title} - Image ${i + 1}`}
@@ -37,12 +36,16 @@ export default async function VideoDetailPage({ params }: { params: { id: string
             ))}
           </div>
         ) : isWeb && images.length > 0 ? (
-          <div className={`relative rounded-2xl overflow-hidden border ${color.border} bg-white/[0.03]`}>
-            <img
-              src={images[0]}
-              alt={video.title}
-              className="w-full h-auto object-contain"
-            />
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {images.map((url, i) => (
+              <div key={i} className="relative aspect-video rounded-2xl overflow-hidden border border-zinc-200 bg-zinc-50">
+                <img
+                  src={url}
+                  alt={`${video.title} - Image ${i + 1}`}
+                  className="absolute inset-0 w-full h-full object-cover"
+                />
+              </div>
+            ))}
           </div>
         ) : video.videoUrl ? (
           <VideoPlayer url={video.videoUrl} title={video.title} />
@@ -51,13 +54,13 @@ export default async function VideoDetailPage({ params }: { params: { id: string
         <div className="mt-8 space-y-6 animate-fade-in">
           <div>
             <div className="flex items-center gap-2 mb-3">
-              <div className={`w-2 h-2 rounded-full ${color.dot}`} />
-              <span className={`text-sm font-medium ${color.text} uppercase tracking-wider`}>
+              <div className="w-2 h-2 rounded-full bg-zinc-400" />
+              <span className="text-sm font-medium text-zinc-500 uppercase tracking-wider">
                 {getCategoryLabel(video.category)}
                 {video.subcategory && ` · ${getSubcategoryLabel(video.category, video.subcategory)}`}
               </span>
             </div>
-            <h1 className="text-3xl sm:text-4xl font-bold tracking-tight">{video.title}</h1>
+            <h1 className="text-3xl sm:text-4xl font-bold tracking-tight text-zinc-900">{video.title}</h1>
           </div>
 
           <div className="flex flex-wrap gap-6 text-sm text-zinc-500">
@@ -66,7 +69,7 @@ export default async function VideoDetailPage({ params }: { params: { id: string
               <span>{video.client}</span>
             </div>
             <div className="flex items-center gap-2">
-              <Tag size={16} className={color.text} />
+              <Tag size={16} />
               <span>
                 {getCategoryLabel(video.category)}
                 {video.subcategory && ` · ${getSubcategoryLabel(video.category, video.subcategory)}`}
@@ -84,9 +87,9 @@ export default async function VideoDetailPage({ params }: { params: { id: string
           </div>
 
           {video.description && (
-            <div className={`glass rounded-2xl p-6 border ${color.border}`}>
-              <h2 className="text-lg font-semibold mb-3">Description</h2>
-              <p className="text-zinc-400 leading-relaxed whitespace-pre-line">
+            <div className="bg-zinc-50 rounded-2xl p-6 border border-zinc-200">
+              <h2 className="text-lg font-semibold mb-3 text-zinc-900">Description</h2>
+              <p className="text-zinc-500 leading-relaxed whitespace-pre-line">
                 {video.description}
               </p>
             </div>

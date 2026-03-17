@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import { Play, Image as ImageIcon, Globe } from "lucide-react";
-import { getCategoryLabel, getCategoryColor, isMarketingDigital, isSiteWeb, getSubcategoryLabel } from "@/lib/categories";
+import { getCategoryLabel, isMarketingDigital, isSiteWeb, getSubcategoryLabel } from "@/lib/categories";
 
 interface VideoCardProps {
   id: string;
@@ -16,13 +16,11 @@ interface VideoCardProps {
 }
 
 export function VideoCard({ id, title, client, category, subcategory, thumbnailUrl, returnCat, returnSub }: VideoCardProps) {
-  const color = getCategoryColor(category);
   const isMarketing = isMarketingDigital(category);
   const isWeb = isSiteWeb(category);
 
   const HoverIcon = isMarketing ? ImageIcon : isWeb ? Globe : Play;
 
-  // Construire l'URL avec les paramètres de retour
   const params = new URLSearchParams();
   if (returnCat) params.set("from_cat", returnCat);
   if (returnSub) params.set("from_sub", returnSub);
@@ -31,20 +29,20 @@ export function VideoCard({ id, title, client, category, subcategory, thumbnailU
 
   return (
     <a href={href} className="group block">
-      <div className={`relative ${isMarketing ? "aspect-[4/5]" : "aspect-video"} rounded-2xl overflow-hidden glass-strong`}>
+      <div className={`relative ${isMarketing ? "aspect-[4/5]" : "aspect-video"} rounded-2xl overflow-hidden shadow-sm hover:shadow-lg transition-shadow duration-300`}>
         <Image
           src={thumbnailUrl}
           alt={title}
           fill
-          className={`${isMarketing ? "object-contain" : "object-cover"} transition-transform duration-700 group-hover:scale-105`}
+          className={`${isMarketing ? "object-contain bg-zinc-100" : "object-cover"} transition-transform duration-700 group-hover:scale-105`}
           sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent opacity-70 group-hover:opacity-90 transition-opacity duration-500" />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/10 to-transparent opacity-60 group-hover:opacity-80 transition-opacity duration-500" />
 
         {/* Hover icon */}
         <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-500">
-          <div className={`${isMarketing ? "w-10 h-10" : "w-14 h-14"} rounded-full ${color.bg} backdrop-blur-md flex items-center justify-center border ${color.border}`}>
-            <HoverIcon size={isMarketing ? 16 : 22} className={`${color.text} ${!isMarketing && !isWeb ? "ml-0.5" : ""}`} fill={!isMarketing && !isWeb ? "currentColor" : "none"} />
+          <div className={`${isMarketing ? "w-10 h-10" : "w-14 h-14"} rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center border border-white/30`}>
+            <HoverIcon size={isMarketing ? 16 : 22} className={`text-white ${!isMarketing && !isWeb ? "ml-0.5" : ""}`} fill={!isMarketing && !isWeb ? "currentColor" : "none"} />
           </div>
         </div>
 

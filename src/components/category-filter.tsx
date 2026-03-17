@@ -20,8 +20,8 @@ export function CategoryFilter({ active, onChange, activeSubcategory, onSubcateg
           onClick={() => { onChange(null); onSubcategoryChange?.(null); }}
           className={`px-4 py-2 rounded-full text-sm font-medium transition-all duration-300 ${
             active === null
-              ? "bg-white text-zinc-900"
-              : "bg-white/[0.03] text-zinc-500 hover:text-white border border-white/[0.06]"
+              ? "bg-zinc-900 text-white"
+              : "bg-zinc-100 text-zinc-500 hover:text-zinc-900 border border-zinc-200"
           }`}
         >
           Toutes
@@ -32,11 +32,10 @@ export function CategoryFilter({ active, onChange, activeSubcategory, onSubcateg
             onClick={() => { onChange(cat.slug); onSubcategoryChange?.(null); }}
             className={`flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium transition-all duration-300 ${
               active === cat.slug
-                ? `${cat.color.bgSolid} text-white`
-                : `bg-white/[0.03] text-zinc-500 hover:text-white border border-white/[0.06]`
+                ? "bg-zinc-900 text-white"
+                : "bg-zinc-100 text-zinc-500 hover:text-zinc-900 border border-zinc-200"
             }`}
           >
-            <div className={`w-1.5 h-1.5 rounded-full ${active === cat.slug ? "bg-white" : cat.color.dot}`} />
             {cat.label}
           </button>
         ))}
@@ -49,8 +48,8 @@ export function CategoryFilter({ active, onChange, activeSubcategory, onSubcateg
             onClick={() => onSubcategoryChange?.(null)}
             className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all duration-300 ${
               activeSubcategory === null
-                ? `${activeCat.color.bg} ${activeCat.color.text} border ${activeCat.color.border}`
-                : "bg-white/[0.02] text-zinc-600 hover:text-zinc-300 border border-white/[0.04]"
+                ? "bg-zinc-200 text-zinc-900 border border-zinc-300"
+                : "bg-zinc-50 text-zinc-500 hover:text-zinc-700 border border-zinc-200"
             }`}
           >
             Tous
@@ -61,8 +60,8 @@ export function CategoryFilter({ active, onChange, activeSubcategory, onSubcateg
               onClick={() => onSubcategoryChange?.(sub.slug)}
               className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all duration-300 ${
                 activeSubcategory === sub.slug
-                  ? `${activeCat.color.bg} ${activeCat.color.text} border ${activeCat.color.border}`
-                  : "bg-white/[0.02] text-zinc-600 hover:text-zinc-300 border border-white/[0.04]"
+                  ? "bg-zinc-200 text-zinc-900 border border-zinc-300"
+                  : "bg-zinc-50 text-zinc-500 hover:text-zinc-700 border border-zinc-200"
               }`}
             >
               {sub.label}

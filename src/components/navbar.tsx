@@ -23,7 +23,7 @@ export function Navbar() {
   }, []);
 
   return (
-    <nav className="sticky top-0 z-50 glass">
+    <nav className="sticky top-0 z-50 bg-white/80 backdrop-blur-xl border-b border-zinc-200">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           <Link href="/" className="flex items-center gap-3 group">
@@ -34,7 +34,7 @@ export function Navbar() {
                 className="h-8 w-auto object-contain group-hover:scale-105 transition-transform"
               />
             ) : (
-              <span className="text-lg font-bold tracking-widest uppercase">
+              <span className="text-lg font-bold tracking-widest uppercase text-zinc-900">
                 {settings.siteTitle || "Flow Studio"}
               </span>
             )}
@@ -44,7 +44,7 @@ export function Navbar() {
             {isAdmin && (
               <Link
                 href="/admin"
-                className="flex items-center gap-2 px-3 py-2 text-sm text-zinc-400 hover:text-white rounded-lg hover:bg-white/5 transition"
+                className="flex items-center gap-2 px-3 py-2 text-sm text-zinc-500 hover:text-zinc-900 rounded-lg hover:bg-zinc-100 transition"
               >
                 <Settings size={16} />
                 <span className="hidden sm:inline">Admin</span>
@@ -52,19 +52,19 @@ export function Navbar() {
             )}
             <Link
               href="/"
-              className="flex items-center gap-2 px-3 py-2 text-sm text-zinc-400 hover:text-white rounded-lg hover:bg-white/5 transition"
+              className="flex items-center gap-2 px-3 py-2 text-sm text-zinc-500 hover:text-zinc-900 rounded-lg hover:bg-zinc-100 transition"
             >
               <LayoutGrid size={16} />
               <span className="hidden sm:inline">Portfolio</span>
             </Link>
-            <div className="h-6 w-px bg-white/10 mx-1" />
+            <div className="h-6 w-px bg-zinc-200 mx-1" />
             <div className="flex items-center gap-2">
-              <span className="text-sm text-zinc-500 hidden sm:inline">
+              <span className="text-sm text-zinc-400 hidden sm:inline">
                 {session?.user?.name}
               </span>
               <button
                 onClick={() => signOut({ callbackUrl: "/login" })}
-                className="flex items-center gap-2 p-2 text-zinc-500 hover:text-white rounded-lg hover:bg-white/5 transition"
+                className="flex items-center gap-2 p-2 text-zinc-400 hover:text-zinc-900 rounded-lg hover:bg-zinc-100 transition"
               >
                 <LogOut size={16} />
               </button>

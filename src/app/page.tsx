@@ -165,7 +165,11 @@ export default function HomePage() {
               : "grid-cols-1 md:grid-cols-2 lg:grid-cols-3"
           }`}>
             {filtered.map((video, i) => (
-              <div key={video.id} className="animate-fade-in" style={{ animationDelay: `${i * 50}ms` }}>
+              <div
+                key={video.id}
+                className={`animate-fade-in ${!activeCategory && video.category === "marketing-digital" ? "max-w-[160px] mx-auto w-full" : ""}`}
+                style={{ animationDelay: `${i * 50}ms` }}
+              >
                 <VideoCard
                   id={video.id}
                   title={video.title}

@@ -167,7 +167,7 @@ export default function HomePage() {
             {filtered.map((video, i) => (
               <div
                 key={video.id}
-                className={`animate-fade-in ${!activeCategory && video.category === "marketing-digital" ? "max-w-[160px] mx-auto w-full" : ""}`}
+                className={`animate-fade-in ${!activeCategory && video.category === "marketing-digital" ? "max-w-[220px] mx-auto w-full" : ""}`}
                 style={{ animationDelay: `${i * 50}ms` }}
               >
                 <VideoCard

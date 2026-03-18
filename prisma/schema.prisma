@@ -45,9 +45,14 @@ model ClientVideoAccess {
 }
 
 model SiteSettings {
-  id          String @id @default("main")
-  siteTitle   String @default("FLOW STUDIO")
-  subtitle    String @default("NOS RÉALISATIONS")
-  logoUrl     String @default("")
-  footerText  String @default("Flow Studio. Tous droits réservés.")
+  id                  String @id @default("main")
+  siteTitle           String @default("FLOW STUDIO")
+  subtitle            String @default("NOS RÉALISATIONS")
+  logoUrl             String @default("")
+  footerText          String @default("Flow Studio. Tous droits réservés.")
+  titleSize           String @default("lg")
+  subtitleSize        String @default("lg")
+  heroDescription     String @default("")
+  heroDescriptionSize String @default("md")
+  heroAlign           String @default("left")
 }

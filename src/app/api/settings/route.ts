@@ -20,12 +20,12 @@ export async function PUT(request: Request) {
   }
 
   const body = await request.json();
-  const { siteTitle, subtitle, logoUrl, footerText } = body;
+  const { siteTitle, subtitle, logoUrl, footerText, titleSize, subtitleSize, heroDescription, heroDescriptionSize, heroAlign } = body;
 
   const settings = await prisma.siteSettings.upsert({
     where: { id: "main" },
-    update: { siteTitle, subtitle, logoUrl, footerText },
-    create: { id: "main", siteTitle, subtitle, logoUrl, footerText },
+    update: { siteTitle, subtitle, logoUrl, footerText, titleSize, subtitleSize, heroDescription, heroDescriptionSize, heroAlign },
+    create: { id: "main", siteTitle, subtitle, logoUrl, footerText, titleSize, subtitleSize, heroDescription, heroDescriptionSize, heroAlign },
   });
 
   return NextResponse.json(settings);

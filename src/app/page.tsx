@@ -24,7 +24,37 @@ interface SiteSettings {
   subtitle: string;
   footerText: string;
   logoUrl: string;
+  titleSize: string;
+  subtitleSize: string;
+  heroDescription: string;
+  heroDescriptionSize: string;
+  heroAlign: string;
 }
+
+const TITLE_CLASSES: Record<string, string> = {
+  xs: "text-3xl sm:text-4xl lg:text-5xl",
+  sm: "text-4xl sm:text-5xl lg:text-6xl",
+  md: "text-4xl sm:text-5xl lg:text-6xl",
+  lg: "text-5xl sm:text-6xl lg:text-7xl",
+  xl: "text-6xl sm:text-7xl lg:text-8xl",
+  "2xl": "text-7xl sm:text-8xl lg:text-9xl",
+};
+
+const SUBTITLE_CLASSES: Record<string, string> = {
+  xs: "text-lg sm:text-xl",
+  sm: "text-xl sm:text-2xl",
+  md: "text-xl sm:text-2xl",
+  lg: "text-2xl sm:text-3xl",
+  xl: "text-3xl sm:text-4xl",
+};
+
+const DESC_CLASSES: Record<string, string> = {
+  xs: "text-xs",
+  sm: "text-sm",
+  md: "text-base",
+  lg: "text-lg",
+  xl: "text-xl",
+};
 
 const FILTER_KEY = "portfolio-filters";
 const SIZE_KEY = "portfolio-grid-size";
@@ -69,6 +99,11 @@ export default function HomePage() {
     subtitle: "NOS RÉALISATIONS",
     footerText: "Flow Studio. Tous droits réservés.",
     logoUrl: "",
+    titleSize: "lg",
+    subtitleSize: "lg",
+    heroDescription: "",
+    heroDescriptionSize: "md",
+    heroAlign: "left",
   });
 
   useEffect(() => {
@@ -126,13 +161,18 @@ export default function HomePage() {
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16">
         {/* Hero */}
-        <div className="mb-14 animate-fade-in">
-          <h1 className="text-5xl sm:text-6xl lg:text-7xl font-bold tracking-tight leading-none text-zinc-900 dark:text-zinc-100">
+        <div className={`mb-14 animate-fade-in ${settings.heroAlign === "center" ? "text-center" : "text-left"}`}>
+          <h1 className={`${TITLE_CLASSES[settings.titleSize] ?? TITLE_CLASSES.lg} font-bold tracking-tight leading-none text-zinc-900 dark:text-zinc-100`}>
             {settings.siteTitle}
           </h1>
-          <h2 className="text-2xl sm:text-3xl font-light tracking-wide text-zinc-400 mt-3">
+          <h2 className={`${SUBTITLE_CLASSES[settings.subtitleSize] ?? SUBTITLE_CLASSES.lg} font-light tracking-wide text-zinc-400 mt-3`}>
             {settings.subtitle}
           </h2>
+          {settings.heroDescription && (
+            <p className={`${DESC_CLASSES[settings.heroDescriptionSize] ?? DESC_CLASSES.md} text-zinc-500 dark:text-zinc-400 mt-4 max-w-2xl ${settings.heroAlign === "center" ? "mx-auto" : ""}`}>
+              {settings.heroDescription}
+            </p>
+          )}
         </div>
 
         {/* Filters */}

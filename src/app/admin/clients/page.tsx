@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { Navbar } from "@/components/navbar";
 import Link from "next/link";
 import {
-  ArrowLeft, Plus, Trash2, Users, Copy, Check, Eye, EyeOff,
+  ArrowLeft, Plus, Trash2, Users, Copy, Check, Eye, EyeOff, Settings2,
 } from "lucide-react";
 
 interface ClientUser {
@@ -266,6 +266,13 @@ export default function ClientsPage() {
                       year: "numeric",
                     }).format(new Date(client.createdAt))}
                   </span>
+                  <Link
+                    href={`/admin/clients/${client.id}/access`}
+                    className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 bg-zinc-100 dark:bg-white/[0.05] hover:bg-zinc-200 dark:hover:bg-white/10 rounded-lg transition"
+                  >
+                    <Settings2 size={13} />
+                    Accès vidéos
+                  </Link>
                   <button
                     onClick={() => handleDelete(client.id, client.name)}
                     disabled={deleting === client.id}

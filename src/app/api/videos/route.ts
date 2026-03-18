@@ -4,6 +4,24 @@ import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 
 export async function GET() {
+  const session = await getServerSession(authOptions);
+
+  // Viewers only see videos they have been granted access to
+  if (session?.user?.role === "viewer") {
+    const userId = (session.user as any).id as string;
+    const access = await prisma.clientVideoAccess.findMany({
+      where: { userId },
+      select: { videoId: true },
+    });
+    const allowedIds = access.map((a) => a.videoId);
+
+    const videos = await prisma.video.findMany({
+      where: { id: { in: allowedIds } },
+      orderBy: [{ sortOrder: "asc" }, { createdAt: "desc" }],
+    });
+    return NextResponse.json(videos);
+  }
+
   const videos = await prisma.video.findMany({
     orderBy: [{ sortOrder: "asc" }, { createdAt: "desc" }],
   });

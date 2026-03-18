@@ -9,27 +9,39 @@ datasource db {
 }
 
 model User {
-  id        String   @id @default(cuid())
-  email     String   @unique
-  password  String
-  name      String
-  role      String   @default("viewer") // "admin" | "viewer"
-  createdAt DateTime @default(now())
+  id          String               @id @default(cuid())
+  email       String               @unique
+  password    String
+  name        String
+  role        String               @default("viewer") // "admin" | "viewer"
+  createdAt   DateTime             @default(now())
+  videoAccess ClientVideoAccess[]
 }
 
 model Video {
-  id           String   @id @default(cuid())
+  id           String               @id @default(cuid())
   title        String
   client       String
-  description  String   @default("")
-  category     String   // "motion-design" | "filme" | "marketing-digital" | "site-web"
-  subcategory  String   @default("") // sous-catégorie optionnelle
+  description  String               @default("")
+  category     String               // "motion-design" | "filme" | "marketing-digital" | "site-web"
+  subcategory  String               @default("") // sous-catégorie optionnelle
   thumbnailUrl String
-  videoUrl     String   @default("")
-  imageUrls    String   @default("[]") // JSON array of image URLs
-  sortOrder    Int      @default(0)
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
+  videoUrl     String               @default("")
+  imageUrls    String               @default("[]") // JSON array of image URLs
+  sortOrder    Int                  @default(0)
+  createdAt    DateTime             @default(now())
+  updatedAt    DateTime             @updatedAt
+  clientAccess ClientVideoAccess[]
+}
+
+model ClientVideoAccess {
+  id      String @id @default(cuid())
+  userId  String
+  videoId String
+  user    User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  video   Video  @relation(fields: [videoId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, videoId])
 }
 
 model SiteSettings {

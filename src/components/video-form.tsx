@@ -420,7 +420,7 @@ export function VideoForm({ initialData, videoId }: VideoFormProps) {
   );
 }
 
-// Mini component for uploading individual images
+// Mini component for uploading individual images (direct Cloudinary upload)
 function ImageUploadSlot({
   onUploaded,
   borderClass,
@@ -433,24 +433,81 @@ function ImageUploadSlot({
   aspectClass?: string;
 }) {
   const [uploading, setUploading] = useState(false);
+  const [progress, setProgress] = useState(0);
 
   async function handleFile(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
     if (!file) return;
 
     setUploading(true);
-    const formData = new FormData();
-    formData.append("file", file);
-    formData.append("type", "thumbnail");
+    setProgress(0);
 
     try {
-      const res = await fetch("/api/upload", { method: "POST", body: formData });
-      if (res.ok) {
-        const { url } = await res.json();
-        onUploaded(url);
+      // 1. Get Cloudinary signature
+      const sigRes = await fetch("/api/upload-signature", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ folder: "thumbnails" }),
+      });
+
+      if (!sigRes.ok) {
+        // Fallback: upload via server API (dev local)
+        const formData = new FormData();
+        formData.append("file", file);
+        formData.append("type", "thumbnail");
+        const res = await fetch("/api/upload", { method: "POST", body: formData });
+        if (res.ok) {
+          const { url } = await res.json();
+          onUploaded(url);
+        } else {
+          alert("Erreur lors de l'upload");
+        }
+        setUploading(false);
+        setProgress(0);
+        return;
       }
-    } finally {
+
+      const { signature, timestamp, cloudName, apiKey, folder } = await sigRes.json();
+
+      // 2. Direct upload to Cloudinary from browser
+      const formData = new FormData();
+      formData.append("file", file);
+      formData.append("signature", signature);
+      formData.append("timestamp", String(timestamp));
+      formData.append("api_key", apiKey);
+      formData.append("folder", folder);
+
+      const xhr = new XMLHttpRequest();
+      xhr.open("POST", `https://api.cloudinary.com/v1_1/${cloudName}/image/upload`);
+
+      xhr.upload.onprogress = (ev) => {
+        if (ev.lengthComputable) {
+          setProgress(Math.round((ev.loaded / ev.total) * 100));
+        }
+      };
+
+      xhr.onload = () => {
+        if (xhr.status === 200) {
+          const result = JSON.parse(xhr.responseText);
+          onUploaded(result.secure_url);
+        } else {
+          alert("Erreur lors de l'upload vers Cloudinary");
+        }
+        setUploading(false);
+        setProgress(0);
+      };
+
+      xhr.onerror = () => {
+        alert("Erreur réseau lors de l'upload");
+        setUploading(false);
+        setProgress(0);
+      };
+
+      xhr.send(formData);
+    } catch {
+      alert("Erreur lors de l'upload");
       setUploading(false);
+      setProgress(0);
     }
   }
 
@@ -458,7 +515,10 @@ function ImageUploadSlot({
     <label className={`relative ${aspectClass} rounded-xl border-2 border-dashed ${borderClass} flex flex-col items-center justify-center gap-2 cursor-pointer hover:bg-zinc-100 dark:hover:bg-white/[0.03] transition`}>
       <input type="file" accept="image/*" onChange={handleFile} className="hidden" />
       {uploading ? (
-        <div className="w-6 h-6 border-2 border-zinc-600 border-t-white rounded-full animate-spin" />
+        <div className="flex flex-col items-center gap-1.5">
+          <div className="w-6 h-6 border-2 border-zinc-600 border-t-white rounded-full animate-spin" />
+          {progress > 0 && <span className="text-xs text-zinc-400">{progress}%</span>}
+        </div>
       ) : (
         <>
           <Plus size={20} className={textClass} />

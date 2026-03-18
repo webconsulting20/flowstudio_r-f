@@ -140,7 +140,8 @@ export default function HomePage() {
       fetch("/api/settings").then((r) => r.json()).catch(() => settings),
     ]).then(([vids, s]) => {
       setVideos(vids);
-      setSettings(s);
+      // Merge with defaults so null/missing fields don't break the UI
+      setSettings((prev) => ({ ...prev, ...Object.fromEntries(Object.entries(s).filter(([, v]) => v != null)) }));
       setLoading(false);
     });
   }, []);

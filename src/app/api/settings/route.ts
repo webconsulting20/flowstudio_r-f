@@ -3,6 +3,9 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 
+// Force dynamic so settings changes are always reflected immediately
+export const dynamic = "force-dynamic";
+
 export async function GET() {
   let settings = await prisma.siteSettings.findUnique({ where: { id: "main" } });
   if (!settings) {

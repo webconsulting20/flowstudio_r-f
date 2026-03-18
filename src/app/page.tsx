@@ -1,10 +1,10 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Navbar } from "@/components/navbar";
 import { VideoCard } from "@/components/video-card";
 import { CategoryFilter } from "@/components/category-filter";
-import { Search } from "lucide-react";
+import { Search, LayoutGrid, Grid3X3, Grip } from "lucide-react";
 
 interface VideoItem {
   id: string;
@@ -27,6 +27,8 @@ interface SiteSettings {
 }
 
 const FILTER_KEY = "portfolio-filters";
+const SIZE_KEY = "portfolio-grid-size";
+type GridSize = "large" | "medium" | "small";
 
 function saveFilters(cat: string | null, sub: string | null, q: string) {
   try { sessionStorage.setItem(FILTER_KEY, JSON.stringify({ cat, sub, q })); } catch {}
@@ -55,6 +57,13 @@ export default function HomePage() {
   const [activeCategory, _setCat] = useState<string | null>(null);
   const [activeSubcategory, _setSub] = useState<string | null>(null);
   const [search, _setSearch] = useState("");
+  const [gridSize, setGridSizeState] = useState<GridSize>("large");
+
+  const setGridSize = (s: GridSize) => {
+    setGridSizeState(s);
+    try { localStorage.setItem(SIZE_KEY, s); } catch {}
+  };
+
   const [settings, setSettings] = useState<SiteSettings>({
     siteTitle: "FLOW STUDIO",
     subtitle: "NOS RÉALISATIONS",
@@ -67,6 +76,10 @@ export default function HomePage() {
     _setCat(saved.cat);
     _setSub(saved.sub);
     _setSearch(saved.q);
+    try {
+      const savedSize = localStorage.getItem(SIZE_KEY) as GridSize | null;
+      if (savedSize) setGridSizeState(savedSize);
+    } catch {}
     setMounted(true);
   }, []);
 
@@ -131,15 +144,40 @@ export default function HomePage() {
             onSubcategoryChange={setActiveSubcategory}
           />
 
-          <div className="relative">
-            <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400" />
-            <input
-              type="text"
-              placeholder="Rechercher..."
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              className="pl-9 pr-4 py-2.5 bg-zinc-50 dark:bg-white/[0.03] border border-zinc-200 dark:border-white/[0.06] rounded-xl text-sm text-zinc-900 dark:text-zinc-100 placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-zinc-300 dark:focus:ring-zinc-600 focus:border-transparent transition w-full sm:w-56"
-            />
+          <div className="flex items-center gap-3">
+            {/* Grid size buttons */}
+            <div className="flex items-center gap-0.5 p-1 bg-zinc-100 dark:bg-white/[0.05] border border-zinc-200 dark:border-white/[0.08] rounded-xl">
+              {([
+                { key: "large", icon: LayoutGrid, title: "Grande taille" },
+                { key: "medium", icon: Grid3X3, title: "Taille moyenne" },
+                { key: "small", icon: Grip, title: "Petite taille" },
+              ] as { key: GridSize; icon: React.ElementType; title: string }[]).map(({ key, icon: Icon, title }) => (
+                <button
+                  key={key}
+                  title={title}
+                  onClick={() => setGridSize(key)}
+                  className={`p-2 rounded-lg transition-all ${
+                    gridSize === key
+                      ? "bg-white dark:bg-zinc-800 shadow-sm text-zinc-900 dark:text-zinc-100"
+                      : "text-zinc-400 dark:text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300"
+                  }`}
+                >
+                  <Icon size={15} />
+                </button>
+              ))}
+            </div>
+
+            {/* Search */}
+            <div className="relative">
+              <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400" />
+              <input
+                type="text"
+                placeholder="Rechercher..."
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                className="pl-9 pr-4 py-2.5 bg-zinc-50 dark:bg-white/[0.03] border border-zinc-200 dark:border-white/[0.06] rounded-xl text-sm text-zinc-900 dark:text-zinc-100 placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-zinc-300 dark:focus:ring-zinc-600 focus:border-transparent transition w-full sm:w-56"
+              />
+            </div>
           </div>
         </div>
 
@@ -157,8 +195,12 @@ export default function HomePage() {
         ) : (
           <div className={`grid gap-4 ${
             activeCategory === "marketing-digital"
-              ? "grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5"
-              : "grid-cols-1 md:grid-cols-2 lg:grid-cols-3"
+              ? gridSize === "large" ? "grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5"
+              : gridSize === "medium" ? "grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6"
+              : "grid-cols-4 sm:grid-cols-5 md:grid-cols-6 lg:grid-cols-8"
+              : gridSize === "large" ? "grid-cols-1 md:grid-cols-2 lg:grid-cols-3"
+              : gridSize === "medium" ? "grid-cols-2 md:grid-cols-3 lg:grid-cols-4"
+              : "grid-cols-3 md:grid-cols-4 lg:grid-cols-5"
           }`}>
             {filtered.map((video, i) => (
               <div
@@ -176,6 +218,7 @@ export default function HomePage() {
                   returnCat={activeCategory}
                   returnSub={activeSubcategory}
                   returnSearch={search}
+                  gridSize={gridSize}
                 />
               </div>
             ))}

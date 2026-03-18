@@ -14,9 +14,10 @@ interface VideoCardProps {
   returnCat?: string | null;
   returnSub?: string | null;
   returnSearch?: string;
+  gridSize?: "large" | "medium" | "small";
 }
 
-export function VideoCard({ id, title, client, category, subcategory, thumbnailUrl, returnCat, returnSub, returnSearch }: VideoCardProps) {
+export function VideoCard({ id, title, client, category, subcategory, thumbnailUrl, returnCat, returnSub, returnSearch, gridSize = "large" }: VideoCardProps) {
   const isMarketing = isMarketingDigital(category);
   const isWeb = isSiteWeb(category);
 
@@ -49,16 +50,20 @@ export function VideoCard({ id, title, client, category, subcategory, thumbnailU
         </div>
 
         {/* Info */}
-        <div className={`absolute bottom-0 left-0 right-0 ${isMarketing ? "p-3" : "p-5"}`}>
-          <div className="flex items-center gap-2 mb-1.5">
-            <div className="w-1.5 h-1.5 rounded-full bg-white" />
-            <span className={`font-medium text-white uppercase tracking-wider ${isMarketing ? "text-[10px]" : "text-xs"}`}>
-              {getCategoryLabel(category)}
-              {subcategory && ` · ${getSubcategoryLabel(category, subcategory)}`}
-            </span>
-          </div>
-          <h3 className={`text-white font-semibold leading-tight ${isMarketing ? "text-sm" : "text-lg"}`}>{client}</h3>
-          <p className={`text-white/80 mt-1 ${isMarketing ? "text-xs" : "text-sm"}`}>{title}</p>
+        <div className={`absolute bottom-0 left-0 right-0 ${isMarketing || gridSize === "small" ? "p-2" : gridSize === "medium" ? "p-3" : "p-5"}`}>
+          {gridSize !== "small" && (
+            <div className="flex items-center gap-2 mb-1.5">
+              <div className="w-1.5 h-1.5 rounded-full bg-white" />
+              <span className={`font-medium text-white uppercase tracking-wider ${isMarketing || gridSize === "medium" ? "text-[10px]" : "text-xs"}`}>
+                {getCategoryLabel(category)}
+                {subcategory && ` · ${getSubcategoryLabel(category, subcategory)}`}
+              </span>
+            </div>
+          )}
+          <h3 className={`text-white font-semibold leading-tight ${isMarketing || gridSize === "small" ? "text-[11px]" : gridSize === "medium" ? "text-sm" : "text-lg"}`}>{client}</h3>
+          {gridSize === "large" && !isMarketing && (
+            <p className="text-white/80 mt-1 text-sm">{title}</p>
+          )}
         </div>
       </div>
     </a>

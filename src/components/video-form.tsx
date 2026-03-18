@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { CATEGORIES, isMarketingDigital, isSiteWeb, getSubcategories } from "@/lib/categories";
 import { FileUpload } from "@/components/file-upload";
 import { VideoPlayer } from "@/components/video-player";
-import { Save, ArrowLeft, Play, EyeOff, Plus, X, Image as ImageIcon } from "lucide-react";
+import { Save, ArrowLeft, Play, EyeOff, Plus, X, Image as ImageIcon, ChevronLeft, ChevronRight, ChevronUp, ChevronDown } from "lucide-react";
 import Link from "next/link";
 
 interface VideoFormData {
@@ -91,6 +91,14 @@ export function VideoForm({ initialData, videoId }: VideoFormProps) {
 
   function removeImage(index: number) {
     updateImages(images.filter((_, i) => i !== index));
+  }
+
+  function moveImage(index: number, direction: -1 | 1) {
+    const newIndex = index + direction;
+    if (newIndex < 0 || newIndex >= images.length) return;
+    const newImages = [...images];
+    [newImages[index], newImages[newIndex]] = [newImages[newIndex], newImages[index]];
+    updateImages(newImages);
   }
 
   async function handleSubmit(e: React.FormEvent) {
@@ -256,19 +264,46 @@ export function VideoForm({ initialData, videoId }: VideoFormProps) {
         {isMarketing ? (
           <div>
             <label className="block text-sm font-medium text-zinc-400 mb-3">
-              Images Instagram ({images.length}/4) *
+              Images Instagram ({images.length}/4) * <span className="text-zinc-500">(utilisez les flèches pour réorganiser)</span>
             </label>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
               {images.map((url, i) => (
-                <div key={i} className={`relative aspect-[4/5] rounded-xl overflow-hidden border ${accentColor?.border ?? "border-zinc-200 dark:border-white/10"} bg-zinc-50 dark:bg-white/[0.03]`}>
+                <div key={i} className={`relative aspect-[4/5] rounded-xl overflow-hidden border ${accentColor?.border ?? "border-zinc-200 dark:border-white/10"} bg-zinc-50 dark:bg-white/[0.03] group`}>
                   <img src={url} alt={`Image ${i + 1}`} className="absolute inset-0 w-full h-full object-cover" />
-                  <button
-                    type="button"
-                    onClick={() => removeImage(i)}
-                    className="absolute top-2 right-2 p-1 bg-black/60 rounded-full text-white hover:bg-red-500 transition"
-                  >
-                    <X size={14} />
-                  </button>
+                  {/* Position badge */}
+                  <span className="absolute top-2 left-2 px-2 py-0.5 bg-black/60 rounded-full text-white text-xs font-medium">
+                    {i + 1}
+                  </span>
+                  {/* Action buttons */}
+                  <div className="absolute top-2 right-2 flex gap-1">
+                    {i > 0 && (
+                      <button
+                        type="button"
+                        onClick={() => moveImage(i, -1)}
+                        className="p-1 bg-black/60 rounded-full text-white hover:bg-zinc-600 transition"
+                        title="Déplacer avant"
+                      >
+                        <ChevronLeft size={14} />
+                      </button>
+                    )}
+                    {i < images.length - 1 && (
+                      <button
+                        type="button"
+                        onClick={() => moveImage(i, 1)}
+                        className="p-1 bg-black/60 rounded-full text-white hover:bg-zinc-600 transition"
+                        title="Déplacer après"
+                      >
+                        <ChevronRight size={14} />
+                      </button>
+                    )}
+                    <button
+                      type="button"
+                      onClick={() => removeImage(i)}
+                      className="p-1 bg-black/60 rounded-full text-white hover:bg-red-500 transition"
+                    >
+                      <X size={14} />
+                    </button>
+                  </div>
                 </div>
               ))}
               {images.length < 4 && (
@@ -284,19 +319,46 @@ export function VideoForm({ initialData, videoId }: VideoFormProps) {
         ) : isWeb ? (
           <div>
             <label className="block text-sm font-medium text-zinc-500 dark:text-zinc-400 mb-3">
-              Images du site ({images.length}/4) * <span className="text-zinc-400">(format horizontal)</span>
+              Images du site ({images.length}/4) * <span className="text-zinc-400">(format horizontal — glissez ou utilisez les flèches pour réorganiser)</span>
             </label>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
               {images.map((url, i) => (
-                <div key={i} className={`relative aspect-video rounded-xl overflow-hidden border ${accentColor?.border ?? "border-zinc-200 dark:border-white/[0.06]"} bg-zinc-50 dark:bg-white/[0.03]`}>
+                <div key={i} className={`relative aspect-video rounded-xl overflow-hidden border ${accentColor?.border ?? "border-zinc-200 dark:border-white/[0.06]"} bg-zinc-50 dark:bg-white/[0.03] group`}>
                   <img src={url} alt={`Image ${i + 1}`} className="absolute inset-0 w-full h-full object-cover" />
-                  <button
-                    type="button"
-                    onClick={() => removeImage(i)}
-                    className="absolute top-2 right-2 p-1 bg-black/60 rounded-full text-white hover:bg-red-500 transition"
-                  >
-                    <X size={14} />
-                  </button>
+                  {/* Position badge */}
+                  <span className="absolute top-2 left-2 px-2 py-0.5 bg-black/60 rounded-full text-white text-xs font-medium">
+                    {i + 1}
+                  </span>
+                  {/* Action buttons */}
+                  <div className="absolute top-2 right-2 flex gap-1">
+                    {i > 0 && (
+                      <button
+                        type="button"
+                        onClick={() => moveImage(i, -1)}
+                        className="p-1 bg-black/60 rounded-full text-white hover:bg-zinc-600 transition"
+                        title="Déplacer avant"
+                      >
+                        <ChevronLeft size={14} />
+                      </button>
+                    )}
+                    {i < images.length - 1 && (
+                      <button
+                        type="button"
+                        onClick={() => moveImage(i, 1)}
+                        className="p-1 bg-black/60 rounded-full text-white hover:bg-zinc-600 transition"
+                        title="Déplacer après"
+                      >
+                        <ChevronRight size={14} />
+                      </button>
+                    )}
+                    <button
+                      type="button"
+                      onClick={() => removeImage(i)}
+                      className="p-1 bg-black/60 rounded-full text-white hover:bg-red-500 transition"
+                    >
+                      <X size={14} />
+                    </button>
+                  </div>
                 </div>
               ))}
               {images.length < 4 && (

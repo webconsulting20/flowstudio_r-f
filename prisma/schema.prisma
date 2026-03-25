@@ -27,6 +27,7 @@ model Video {
   subcategory  String               @default("") // sous-catégorie optionnelle
   thumbnailUrl String
   videoUrl     String               @default("")
+  videoUrls    String               @default("[]") // JSON array of {url, title} for extra videos
   imageUrls    String               @default("[]") // JSON array of image URLs
   sortOrder    Int                  @default(0)
   createdAt    DateTime             @default(now())

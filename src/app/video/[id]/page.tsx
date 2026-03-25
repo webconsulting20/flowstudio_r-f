@@ -1,9 +1,9 @@
 import { prisma } from "@/lib/prisma";
 import { notFound } from "next/navigation";
 import { Navbar } from "@/components/navbar";
-import { VideoPlayer } from "@/components/video-player";
 import { getCategoryLabel, isMarketingDigital, isSiteWeb, getSubcategoryLabel } from "@/lib/categories";
 import { BackButton } from "@/components/back-button";
+import { VideoDetailClient } from "./video-detail-client";
 
 export default async function VideoDetailPage({ params }: { params: { id: string } }) {
   const video = await prisma.video.findUnique({ where: { id: params.id } });
@@ -13,6 +13,7 @@ export default async function VideoDetailPage({ params }: { params: { id: string
   const isMarketing = isMarketingDigital(video.category);
   const isWeb = isSiteWeb(video.category);
   const images: string[] = (isMarketing || isWeb) ? JSON.parse(video.imageUrls || "[]") : [];
+  const extraVideos: { url: string; title: string }[] = JSON.parse((video as any).videoUrls || "[]");
 
   return (
     <div className="min-h-screen bg-white dark:bg-zinc-950">
@@ -47,9 +48,11 @@ export default async function VideoDetailPage({ params }: { params: { id: string
             ))}
           </div>
         ) : video.videoUrl ? (
-          <div className="max-w-3xl">
-            <VideoPlayer url={video.videoUrl} title={video.title} />
-          </div>
+          <VideoDetailClient
+            mainVideoUrl={video.videoUrl}
+            mainVideoTitle={video.title}
+            extraVideos={extraVideos}
+          />
         ) : null}
 
         <div className="mt-8 space-y-6 animate-fade-in">

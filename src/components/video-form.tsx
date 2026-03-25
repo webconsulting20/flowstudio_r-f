@@ -8,6 +8,11 @@ import { VideoPlayer } from "@/components/video-player";
 import { Save, ArrowLeft, Play, EyeOff, Plus, X, Image as ImageIcon, ChevronLeft, ChevronRight, ChevronUp, ChevronDown } from "lucide-react";
 import Link from "next/link";
 
+interface ExtraVideo {
+  url: string;
+  title: string;
+}
+
 interface VideoFormData {
   title: string;
   client: string;
@@ -16,6 +21,7 @@ interface VideoFormData {
   subcategory: string;
   thumbnailUrl: string;
   videoUrl: string;
+  videoUrls: string; // JSON array of {url, title}
   imageUrls: string; // JSON string array
 }
 
@@ -37,6 +43,7 @@ export function VideoForm({ initialData, videoId }: VideoFormProps) {
       subcategory: "",
       thumbnailUrl: "",
       videoUrl: "",
+      videoUrls: "[]",
       imageUrls: "[]",
     }
   );
@@ -47,6 +54,7 @@ export function VideoForm({ initialData, videoId }: VideoFormProps) {
   const isMarketing = isMarketingDigital(form.category);
   const isWeb = isSiteWeb(form.category);
   const images: string[] = JSON.parse(form.imageUrls || "[]");
+  const extraVideos: ExtraVideo[] = JSON.parse(form.videoUrls || "[]");
   const selectedCat = CATEGORIES.find((c) => c.slug === form.category);
   const accentColor = selectedCat?.color;
   const subcategories = getSubcategories(form.category);
@@ -91,6 +99,24 @@ export function VideoForm({ initialData, videoId }: VideoFormProps) {
 
   function removeImage(index: number) {
     updateImages(images.filter((_, i) => i !== index));
+  }
+
+  function updateExtraVideos(newVideos: ExtraVideo[]) {
+    setForm((prev) => ({ ...prev, videoUrls: JSON.stringify(newVideos) }));
+  }
+
+  function addExtraVideo(url: string) {
+    updateExtraVideos([...extraVideos, { url, title: "" }]);
+  }
+
+  function removeExtraVideo(index: number) {
+    updateExtraVideos(extraVideos.filter((_, i) => i !== index));
+  }
+
+  function updateExtraVideoTitle(index: number, title: string) {
+    const updated = [...extraVideos];
+    updated[index] = { ...updated[index], title };
+    updateExtraVideos(updated);
   }
 
   function moveImage(index: number, direction: -1 | 1) {
@@ -372,32 +398,81 @@ export function VideoForm({ initialData, videoId }: VideoFormProps) {
             </div>
           </div>
         ) : (
-          <div>
-            <FileUpload
-              type="video"
-              accept="video/mp4,video/quicktime,video/webm"
-              currentUrl={form.videoUrl}
-              onUploaded={(url) => {
-                update("videoUrl", url);
-                setShowVideoPreview(false);
-              }}
-              label="Fichier vidéo *"
-              accentColor={accentColor ? { bg: accentColor.bg, text: accentColor.text, border: accentColor.border } : undefined}
-            />
+          <div className="space-y-6">
+            {/* Vidéo principale */}
+            <div>
+              <FileUpload
+                type="video"
+                accept="video/mp4,video/quicktime,video/webm"
+                currentUrl={form.videoUrl}
+                onUploaded={(url) => {
+                  update("videoUrl", url);
+                  setShowVideoPreview(false);
+                }}
+                label="Fichier vidéo *"
+                accentColor={accentColor ? { bg: accentColor.bg, text: accentColor.text, border: accentColor.border } : undefined}
+              />
 
-            {form.videoUrl && (
-              <div className="mt-3">
-                <button
-                  type="button"
-                  onClick={() => setShowVideoPreview(!showVideoPreview)}
-                  className="flex items-center gap-1.5 text-xs text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 transition mb-2"
-                >
-                  {showVideoPreview ? <EyeOff size={14} /> : <Play size={14} />}
-                  {showVideoPreview ? "Masquer l'aperçu" : "Prévisualiser la vidéo"}
-                </button>
-                {showVideoPreview && <VideoPlayer url={form.videoUrl} title={form.title || "Aperçu"} />}
-              </div>
-            )}
+              {form.videoUrl && (
+                <div className="mt-3">
+                  <button
+                    type="button"
+                    onClick={() => setShowVideoPreview(!showVideoPreview)}
+                    className="flex items-center gap-1.5 text-xs text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 transition mb-2"
+                  >
+                    {showVideoPreview ? <EyeOff size={14} /> : <Play size={14} />}
+                    {showVideoPreview ? "Masquer l'aperçu" : "Prévisualiser la vidéo"}
+                  </button>
+                  {showVideoPreview && <VideoPlayer url={form.videoUrl} title={form.title || "Aperçu"} />}
+                </div>
+              )}
+            </div>
+
+            {/* Vidéos supplémentaires (facultatif) */}
+            <div className="border-t border-zinc-200 dark:border-white/[0.06] pt-6">
+              <label className="block text-sm font-medium text-zinc-500 dark:text-zinc-400 mb-3">
+                Vidéos supplémentaires <span className="text-zinc-400">(facultatif)</span>
+              </label>
+
+              {extraVideos.length > 0 && (
+                <div className="space-y-3 mb-4">
+                  {extraVideos.map((ev, i) => (
+                    <div key={i} className="bg-white dark:bg-white/[0.02] border border-zinc-200 dark:border-white/[0.06] rounded-xl p-4 space-y-3">
+                      <div className="flex items-center justify-between">
+                        <span className="text-xs font-medium text-zinc-400">Vidéo {i + 2}</span>
+                        <button
+                          type="button"
+                          onClick={() => removeExtraVideo(i)}
+                          className="p-1 text-zinc-400 hover:text-red-500 transition"
+                        >
+                          <X size={16} />
+                        </button>
+                      </div>
+                      <input
+                        type="text"
+                        value={ev.title}
+                        onChange={(e) => updateExtraVideoTitle(i, e.target.value)}
+                        className={inputClass}
+                        placeholder="Titre de la vidéo"
+                      />
+                      <div className="flex items-center gap-2 text-xs text-emerald-500">
+                        <Play size={14} />
+                        <span className="truncate">{ev.url.split("/").pop()}</span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              <FileUpload
+                type="video"
+                accept="video/mp4,video/quicktime,video/webm"
+                currentUrl=""
+                onUploaded={(url) => addExtraVideo(url)}
+                label=""
+                accentColor={accentColor ? { bg: accentColor.bg, text: accentColor.text, border: accentColor.border } : undefined}
+              />
+            </div>
           </div>
         )}
       </div>

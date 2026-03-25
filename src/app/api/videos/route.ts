@@ -35,7 +35,7 @@ export async function POST(request: Request) {
   }
 
   const body = await request.json();
-  const { title, client, description, category, subcategory, thumbnailUrl, videoUrl, imageUrls, sortOrder } = body;
+  const { title, client, description, category, subcategory, thumbnailUrl, videoUrl, videoUrls, imageUrls, sortOrder } = body;
 
   if (!title || !client || !category || !thumbnailUrl) {
     return NextResponse.json({ error: "Titre, client, catégorie et miniature sont requis" }, { status: 400 });
@@ -53,6 +53,7 @@ export async function POST(request: Request) {
       subcategory: subcategory || "",
       thumbnailUrl,
       videoUrl: videoUrl || "",
+      videoUrls: videoUrls || "[]",
       imageUrls: imageUrls || "[]",
       sortOrder: sortOrder ?? nextOrder,
     },

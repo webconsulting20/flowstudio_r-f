@@ -38,6 +38,7 @@ export default function EditVideoPage({ params }: { params: { id: string } }) {
               subcategory: data.subcategory || "",
               thumbnailUrl: data.thumbnailUrl,
               videoUrl: data.videoUrl || "",
+              videoUrls: data.videoUrls || "[]",
               imageUrls: data.imageUrls || "[]",
             }}
           />

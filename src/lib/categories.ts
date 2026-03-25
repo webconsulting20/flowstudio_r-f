@@ -44,7 +44,13 @@ export const CATEGORIES = [
     slug: "marketing-digital",
     label: "Marketing Digital",
     description: "Campagnes et stratégie digitale",
-    subcategories: [],
+    subcategories: [
+      { slug: "organisme-financier", label: "Organisme financier" },
+      { slug: "produit", label: "Produit" },
+      { slug: "assurance", label: "Assurance" },
+      { slug: "restauration", label: "Restauration" },
+      { slug: "immobilier", label: "Immobilier" },
+    ],
     color: NEUTRAL_COLOR,
   },
   {

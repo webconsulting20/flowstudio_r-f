@@ -60,9 +60,9 @@ export function VideoCard({ id, title, client, category, subcategory, thumbnailU
               </span>
             </div>
           )}
-          <h3 className={`text-white font-semibold leading-tight ${isMarketing || gridSize === "small" ? "text-[11px]" : gridSize === "medium" ? "text-sm" : "text-lg"}`}>{client}</h3>
+          <h3 className={`text-white font-semibold leading-tight ${isMarketing || gridSize === "small" ? "text-[11px]" : gridSize === "medium" ? "text-sm" : "text-lg"}`}>{title}</h3>
           {gridSize === "large" && !isMarketing && (
-            <p className="text-white/80 mt-1 text-sm">{title}</p>
+            <p className="text-white/80 mt-1 text-sm">{client}</p>
           )}
         </div>
       </div>

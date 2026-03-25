@@ -51,19 +51,8 @@ export function VideoCard({ id, title, client, category, subcategory, thumbnailU
 
         {/* Info */}
         <div className={`absolute bottom-0 left-0 right-0 ${isMarketing || gridSize === "small" ? "p-2" : gridSize === "medium" ? "p-3" : "p-5"}`}>
-          {gridSize !== "small" && (
-            <div className="flex items-center gap-2 mb-1.5">
-              <div className="w-1.5 h-1.5 rounded-full bg-white" />
-              <span className={`font-medium text-white uppercase tracking-wider ${isMarketing || gridSize === "medium" ? "text-[10px]" : "text-xs"}`}>
-                {getCategoryLabel(category)}
-                {subcategory && ` · ${getSubcategoryLabel(category, subcategory)}`}
-              </span>
-            </div>
-          )}
           <h3 className={`text-white font-semibold leading-tight ${isMarketing || gridSize === "small" ? "text-[11px]" : gridSize === "medium" ? "text-sm" : "text-lg"}`}>{title}</h3>
-          {gridSize === "large" && !isMarketing && (
-            <p className="text-white/80 mt-1 text-sm">{client}</p>
-          )}
+          <p className={`text-white/80 leading-tight ${isMarketing || gridSize === "small" ? "text-[10px] mt-0.5" : gridSize === "medium" ? "text-xs mt-0.5" : "text-sm mt-1"}`}>{client}</p>
         </div>
       </div>
     </a>

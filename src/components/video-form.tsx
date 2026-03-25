@@ -50,11 +50,18 @@ export function VideoForm({ initialData, videoId }: VideoFormProps) {
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
   const [showVideoPreview, setShowVideoPreview] = useState(false);
+  // Main video title stored as first entry in videoUrls
+  const parsedVideoUrls: ExtraVideo[] = JSON.parse(form.videoUrls || "[]");
+  const [mainVideoTitle, setMainVideoTitle] = useState(() => {
+    // If videoUrls has an entry matching the main videoUrl, use its title
+    const main = parsedVideoUrls.find((v) => v.url === form.videoUrl);
+    return main?.title || "";
+  });
 
   const isMarketing = isMarketingDigital(form.category);
   const isWeb = isSiteWeb(form.category);
   const images: string[] = JSON.parse(form.imageUrls || "[]");
-  const extraVideos: ExtraVideo[] = JSON.parse(form.videoUrls || "[]");
+  const extraVideos: ExtraVideo[] = parsedVideoUrls.filter((v) => v.url !== form.videoUrl);
   const selectedCat = CATEGORIES.find((c) => c.slug === form.category);
   const accentColor = selectedCat?.color;
   const subcategories = getSubcategories(form.category);
@@ -101,8 +108,27 @@ export function VideoForm({ initialData, videoId }: VideoFormProps) {
     updateImages(images.filter((_, i) => i !== index));
   }
 
-  function updateExtraVideos(newVideos: ExtraVideo[]) {
-    setForm((prev) => ({ ...prev, videoUrls: JSON.stringify(newVideos) }));
+  // Build the full videoUrls array (main + extras) for storage
+  function buildVideoUrls(mainUrl: string, mainTitle: string, extras: ExtraVideo[]): string {
+    const all: ExtraVideo[] = [];
+    if (mainUrl) all.push({ url: mainUrl, title: mainTitle });
+    all.push(...extras);
+    return JSON.stringify(all);
+  }
+
+  function updateMainVideoTitle(title: string) {
+    setMainVideoTitle(title);
+    setForm((prev) => ({
+      ...prev,
+      videoUrls: buildVideoUrls(prev.videoUrl, title, extraVideos),
+    }));
+  }
+
+  function updateExtraVideos(newExtras: ExtraVideo[]) {
+    setForm((prev) => ({
+      ...prev,
+      videoUrls: buildVideoUrls(prev.videoUrl, mainVideoTitle, newExtras),
+    }));
   }
 
   function addExtraVideo(url: string) {
@@ -400,21 +426,33 @@ export function VideoForm({ initialData, videoId }: VideoFormProps) {
         ) : (
           <div className="space-y-6">
             {/* Vidéo principale */}
-            <div>
+            <div className="space-y-3">
+              <label className="block text-sm font-medium text-zinc-500 dark:text-zinc-400">Vidéo 1 *</label>
               <FileUpload
                 type="video"
                 accept="video/mp4,video/quicktime,video/webm"
                 currentUrl={form.videoUrl}
                 onUploaded={(url) => {
-                  update("videoUrl", url);
+                  setForm((prev) => ({
+                    ...prev,
+                    videoUrl: url,
+                    videoUrls: buildVideoUrls(url, mainVideoTitle, extraVideos),
+                  }));
                   setShowVideoPreview(false);
                 }}
-                label="Fichier vidéo *"
+                label=""
                 accentColor={accentColor ? { bg: accentColor.bg, text: accentColor.text, border: accentColor.border } : undefined}
+              />
+              <input
+                type="text"
+                value={mainVideoTitle}
+                onChange={(e) => updateMainVideoTitle(e.target.value)}
+                className={inputClass}
+                placeholder="Titre de la vidéo 1"
               />
 
               {form.videoUrl && (
-                <div className="mt-3">
+                <div>
                   <button
                     type="button"
                     onClick={() => setShowVideoPreview(!showVideoPreview)}
@@ -423,7 +461,7 @@ export function VideoForm({ initialData, videoId }: VideoFormProps) {
                     {showVideoPreview ? <EyeOff size={14} /> : <Play size={14} />}
                     {showVideoPreview ? "Masquer l'aperçu" : "Prévisualiser la vidéo"}
                   </button>
-                  {showVideoPreview && <VideoPlayer url={form.videoUrl} title={form.title || "Aperçu"} />}
+                  {showVideoPreview && <VideoPlayer url={form.videoUrl} title={mainVideoTitle || form.title || "Aperçu"} />}
                 </div>
               )}
             </div>

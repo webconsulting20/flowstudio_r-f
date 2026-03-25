@@ -4,25 +4,12 @@ import { useState } from "react";
 import { VideoPlayer } from "@/components/video-player";
 import { Play } from "lucide-react";
 
-interface ExtraVideo {
+interface VideoItem {
   url: string;
   title: string;
 }
 
-export function VideoDetailClient({
-  mainVideoUrl,
-  mainVideoTitle,
-  extraVideos,
-}: {
-  mainVideoUrl: string;
-  mainVideoTitle: string;
-  extraVideos: ExtraVideo[];
-}) {
-  const allVideos = [
-    { url: mainVideoUrl, title: mainVideoTitle },
-    ...extraVideos,
-  ];
-
+export function VideoDetailClient({ allVideos }: { allVideos: VideoItem[] }) {
   const [activeIndex, setActiveIndex] = useState(0);
   const hasMultiple = allVideos.length > 1;
 

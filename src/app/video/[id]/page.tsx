@@ -13,7 +13,7 @@ export default async function VideoDetailPage({ params }: { params: { id: string
   const isMarketing = isMarketingDigital(video.category);
   const isWeb = isSiteWeb(video.category);
   const images: string[] = (isMarketing || isWeb) ? JSON.parse(video.imageUrls || "[]") : [];
-  const extraVideos: { url: string; title: string }[] = JSON.parse((video as any).videoUrls || "[]");
+  const allVideoUrls: { url: string; title: string }[] = JSON.parse((video as any).videoUrls || "[]");
 
   return (
     <div className="min-h-screen bg-white dark:bg-zinc-950">
@@ -49,9 +49,11 @@ export default async function VideoDetailPage({ params }: { params: { id: string
           </div>
         ) : video.videoUrl ? (
           <VideoDetailClient
-            mainVideoUrl={video.videoUrl}
-            mainVideoTitle={video.title}
-            extraVideos={extraVideos}
+            allVideos={
+              allVideoUrls.length > 0
+                ? allVideoUrls
+                : [{ url: video.videoUrl, title: video.title }]
+            }
           />
         ) : null}
 

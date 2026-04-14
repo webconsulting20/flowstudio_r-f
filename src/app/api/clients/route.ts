@@ -13,7 +13,7 @@ export async function GET() {
 
   const clients = await prisma.user.findMany({
     where: { role: { in: ["admin", "viewer"] } },
-    select: { id: true, email: true, name: true, role: true, createdAt: true },
+    select: { id: true, email: true, name: true, role: true, canDownload: true, passwordNote: true, createdAt: true },
     orderBy: { createdAt: "desc" },
   });
 
@@ -44,8 +44,8 @@ export async function POST(request: Request) {
   const hashedPassword = await hash(password, 12);
 
   const user = await prisma.user.create({
-    data: { email, name, password: hashedPassword, role: assignedRole },
-    select: { id: true, email: true, name: true, role: true, createdAt: true },
+    data: { email, name, password: hashedPassword, role: assignedRole, passwordNote: password },
+    select: { id: true, email: true, name: true, role: true, canDownload: true, passwordNote: true, createdAt: true },
   });
 
   return NextResponse.json(user, { status: 201 });

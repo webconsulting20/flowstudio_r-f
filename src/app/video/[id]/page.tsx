@@ -10,6 +10,15 @@ import { authOptions } from "@/lib/auth";
 export default async function VideoDetailPage({ params }: { params: { id: string } }) {
   const session = await getServerSession(authOptions);
   const userRole = (session?.user as any)?.role ?? "viewer";
+  const userId = (session?.user as any)?.id as string | undefined;
+
+  // canDownload: superadmin always yes, others check DB field
+  let canDownload = userRole === "superadmin";
+  if (!canDownload && userId) {
+    const userRecord = await prisma.user.findUnique({ where: { id: userId }, select: { canDownload: true } });
+    canDownload = (userRecord as any)?.canDownload === true || (userRecord as any)?.canDownload === 1;
+  }
+
   const video = await prisma.video.findUnique({ where: { id: params.id } });
 
   if (!video) notFound();
@@ -58,7 +67,7 @@ export default async function VideoDetailPage({ params }: { params: { id: string
                 ? allVideoUrls
                 : [{ url: video.videoUrl, title: video.title }]
             }
-            canDownload={userRole === "admin" || userRole === "superadmin"}
+            canDownload={canDownload}
           />
         ) : null}
 

@@ -17,6 +17,10 @@ interface FileUploadProps {
   aspectClass?: string;
 }
 
+const CLOUD_NAME = "dbkrfo4aa";
+const UPLOAD_PRESET = "flowstudio_videos";
+const CHUNK_SIZE = 20 * 1024 * 1024; // 20 MB par chunk
+
 export function FileUpload({
   type,
   accept,
@@ -41,106 +45,125 @@ export function FileUpload({
     setFileName(file.name);
     setProgress(0);
 
+    const isVideo = type === "video" || file.type.startsWith("video/");
+    const resourceType = isVideo ? "video" : "image";
+    const folder = type === "video" ? "flowstudio/videos" : "flowstudio/thumbnails";
+
     try {
-      // 1. Obtenir la signature Cloudinary depuis notre API
-      const folder = type === "video" ? "videos" : "thumbnails";
-      const sigRes = await fetch("/api/upload-signature", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ folder }),
-      });
-
-      if (!sigRes.ok) {
-        // Fallback : upload via notre API (dev local)
-        console.warn(`[FileUpload] Signature failed: ${sigRes.status} — falling back to API proxy (slow)`);
-        const errText = await sigRes.text();
-        console.warn(`[FileUpload] Signature error:`, errText);
-        await uploadViaApi(file);
-        return;
+      // Pour les gros fichiers vidéo (> 20MB) : upload chunké
+      if (isVideo && file.size > CHUNK_SIZE) {
+        await uploadChunked(file, resourceType, folder);
+      } else {
+        await uploadDirect(file, resourceType, folder);
       }
-      console.log("[FileUpload] ✅ Signature OK — uploading directly to Cloudinary");
-
-      const { signature, timestamp, cloudName, apiKey, folder: cloudFolder } = await sigRes.json();
-
-      // 2. Upload directement vers Cloudinary depuis le navigateur
-      const isVideo = type === "video" || file.type.startsWith("video/");
-      const resourceType = isVideo ? "video" : "image";
-
-      const formData = new FormData();
-      formData.append("file", file);
-      formData.append("signature", signature);
-      formData.append("timestamp", String(timestamp));
-      formData.append("api_key", apiKey);
-      formData.append("folder", cloudFolder);
-
-      const xhr = new XMLHttpRequest();
-      xhr.open("POST", `https://api.cloudinary.com/v1_1/${cloudName}/${resourceType}/upload`);
-
-      xhr.upload.onprogress = (e) => {
-        if (e.lengthComputable) {
-          const pct = Math.round((e.loaded / e.total) * 100);
-          setProgress(pct);
-        }
-      };
-
-      xhr.onload = () => {
-        if (xhr.status === 200) {
-          const result = JSON.parse(xhr.responseText);
-          setProgress(100);
-          onUploaded(result.secure_url);
-          setTimeout(() => setUploading(false), 500);
-        } else {
-          alert("Erreur lors de l'upload vers Cloudinary");
-          setUploading(false);
-          setProgress(0);
-        }
-      };
-
-      xhr.onerror = () => {
-        alert("Erreur réseau lors de l'upload");
-        setUploading(false);
-        setProgress(0);
-      };
-
-      xhr.send(formData);
-    } catch {
+    } catch (err) {
+      console.error("[FileUpload] Error:", err);
       alert("Erreur lors de l'upload");
       setUploading(false);
       setProgress(0);
     }
   }
 
-  // Fallback pour le développement local (sans Cloudinary)
-  async function uploadViaApi(file: File) {
+  // Upload direct (petits fichiers / images)
+  async function uploadDirect(file: File, resourceType: string, folder: string) {
     const formData = new FormData();
     formData.append("file", file);
-    formData.append("type", type);
+    formData.append("upload_preset", UPLOAD_PRESET);
+    formData.append("folder", folder);
 
-    const progressInterval = setInterval(() => {
-      setProgress((p) => Math.min(p + 10, 90));
-    }, 200);
+    const xhr = new XMLHttpRequest();
+    xhr.open("POST", `https://api.cloudinary.com/v1_1/${CLOUD_NAME}/${resourceType}/upload`);
 
-    try {
-      const res = await fetch("/api/upload", { method: "POST", body: formData });
-      clearInterval(progressInterval);
+    xhr.upload.onprogress = (e) => {
+      if (e.lengthComputable) {
+        const pct = Math.round((e.loaded / e.total) * 100);
+        setProgress(pct);
+      }
+    };
 
-      if (!res.ok) {
-        const data = await res.json();
-        alert(data.error || "Erreur lors de l'upload");
+    xhr.onload = () => {
+      if (xhr.status === 200) {
+        const result = JSON.parse(xhr.responseText);
+        setProgress(100);
+        onUploaded(result.secure_url);
+        setTimeout(() => setUploading(false), 500);
+      } else {
+        console.error("[FileUpload] Cloudinary error:", xhr.status, xhr.responseText);
+        alert("Erreur lors de l'upload vers Cloudinary");
         setUploading(false);
         setProgress(0);
-        return;
       }
+    };
 
-      const { url } = await res.json();
-      setProgress(100);
-      onUploaded(url);
-      setTimeout(() => setUploading(false), 500);
-    } catch {
-      clearInterval(progressInterval);
+    xhr.onerror = () => {
       alert("Erreur réseau lors de l'upload");
       setUploading(false);
       setProgress(0);
+    };
+
+    xhr.send(formData);
+  }
+
+  // Upload chunké pour les gros fichiers vidéo
+  async function uploadChunked(file: File, resourceType: string, folder: string) {
+    const totalChunks = Math.ceil(file.size / CHUNK_SIZE);
+    const uniqueId = `uqid-${Date.now()}-${Math.random().toString(36).slice(2)}`;
+    let resultUrl = "";
+
+    for (let i = 0; i < totalChunks; i++) {
+      const start = i * CHUNK_SIZE;
+      const end = Math.min(start + CHUNK_SIZE, file.size);
+      const chunk = file.slice(start, end);
+
+      const formData = new FormData();
+      formData.append("file", chunk);
+      formData.append("upload_preset", UPLOAD_PRESET);
+      formData.append("folder", folder);
+
+      const contentRange = `bytes ${start}-${end - 1}/${file.size}`;
+
+      const response = await new Promise<string>((resolve, reject) => {
+        const xhr = new XMLHttpRequest();
+        xhr.open("POST", `https://api.cloudinary.com/v1_1/${CLOUD_NAME}/${resourceType}/upload`);
+        xhr.setRequestHeader("X-Unique-Upload-Id", uniqueId);
+        xhr.setRequestHeader("Content-Range", contentRange);
+
+        xhr.upload.onprogress = (e) => {
+          if (e.lengthComputable) {
+            const chunkProgress = e.loaded / e.total;
+            const totalProgress = ((i + chunkProgress) / totalChunks) * 100;
+            setProgress(Math.round(totalProgress));
+          }
+        };
+
+        xhr.onload = () => {
+          if (xhr.status === 200 || xhr.status === 201) {
+            resolve(xhr.responseText);
+          } else if (xhr.status === 408 || xhr.status === 499) {
+            // Chunk accepté, pas encore fini
+            resolve("");
+          } else {
+            reject(new Error(`Chunk ${i + 1}/${totalChunks} failed: ${xhr.status}`));
+          }
+        };
+
+        xhr.onerror = () => reject(new Error(`Network error on chunk ${i + 1}`));
+        xhr.send(formData);
+      });
+
+      // Le dernier chunk retourne le résultat final
+      if (response && i === totalChunks - 1) {
+        const result = JSON.parse(response);
+        resultUrl = result.secure_url;
+      }
+    }
+
+    if (resultUrl) {
+      setProgress(100);
+      onUploaded(resultUrl);
+      setTimeout(() => setUploading(false), 500);
+    } else {
+      throw new Error("Upload chunké terminé sans URL de résultat");
     }
   }
 
@@ -230,7 +253,7 @@ export function FileUpload({
               Glissez un fichier ici ou <span className="text-zinc-700 dark:text-white/60">parcourir</span>
             </p>
             <p className="text-xs text-zinc-400 dark:text-zinc-600">
-              {type === "video" ? "MP4, MOV, WebM" : "JPG, PNG, WebP"}
+              {type === "video" ? "MP4, MOV, WebM (max 100MB)" : "JPG, PNG, WebP"}
             </p>
           </div>
         )}

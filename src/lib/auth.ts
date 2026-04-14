@@ -35,6 +35,20 @@ export const authOptions: NextAuthOptions = {
         token.role = (user as any).role;
         token.id = user.id;
       }
+      // Toujours rafraîchir le rôle depuis la DB pour éviter les sessions obsolètes
+      if (token.id) {
+        try {
+          const dbUser = await prisma.user.findUnique({
+            where: { id: token.id as string },
+            select: { role: true },
+          });
+          if (dbUser) {
+            token.role = dbUser.role;
+          }
+        } catch {
+          // En cas d'erreur DB, garder le rôle du token
+        }
+      }
       return token;
     },
     async session({ session, token }) {

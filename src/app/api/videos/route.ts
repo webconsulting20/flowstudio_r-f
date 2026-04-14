@@ -6,8 +6,8 @@ import { prisma } from "@/lib/prisma";
 export async function GET() {
   const session = await getServerSession(authOptions);
 
-  // Viewers only see videos they have been granted access to
-  if (session?.user?.role === "viewer") {
+  // viewer and admin (download client) only see their granted videos
+  if (session?.user?.role === "viewer" || session?.user?.role === "admin") {
     const userId = (session.user as any).id as string;
     const access = await prisma.clientVideoAccess.findMany({
       where: { userId },
@@ -22,6 +22,7 @@ export async function GET() {
     return NextResponse.json(videos);
   }
 
+  // superadmin sees all videos
   const videos = await prisma.video.findMany({
     orderBy: [{ sortOrder: "asc" }, { createdAt: "desc" }],
   });
@@ -30,7 +31,7 @@ export async function GET() {
 
 export async function POST(request: Request) {
   const session = await getServerSession(authOptions);
-  if (!session || session.user.role !== "admin") {
+  if (!session || session.user.role !== "superadmin") {
     return NextResponse.json({ error: "Non autorisé" }, { status: 403 });
   }
 

@@ -2,22 +2,29 @@
 
 import { useState } from "react";
 import { VideoPlayer } from "@/components/video-player";
-import { Play } from "lucide-react";
+import { Play, Download } from "lucide-react";
 
 interface VideoItem {
   url: string;
   title: string;
 }
 
-export function VideoDetailClient({ allVideos }: { allVideos: VideoItem[] }) {
+export function VideoDetailClient({
+  allVideos,
+  canDownload = false,
+}: {
+  allVideos: VideoItem[];
+  canDownload?: boolean;
+}) {
   const [activeIndex, setActiveIndex] = useState(0);
   const hasMultiple = allVideos.length > 1;
+  const activeVideo = allVideos[activeIndex];
 
   return (
     <div className="space-y-4">
       {/* Player */}
       <div className="max-w-3xl">
-        <VideoPlayer url={allVideos[activeIndex].url} title={allVideos[activeIndex].title} />
+        <VideoPlayer url={activeVideo.url} title={activeVideo.title} />
       </div>
 
       {/* Video selector — only if multiple videos */}
@@ -39,6 +46,22 @@ export function VideoDetailClient({ allVideos }: { allVideos: VideoItem[] }) {
               </button>
             ))}
           </div>
+        </div>
+      )}
+
+      {/* Download button — only for admin / superadmin */}
+      {canDownload && activeVideo.url && (
+        <div className="max-w-3xl">
+          <a
+            href={activeVideo.url}
+            download
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium bg-zinc-100 dark:bg-white/[0.05] hover:bg-zinc-200 dark:hover:bg-white/10 border border-zinc-200 dark:border-white/[0.06] text-zinc-700 dark:text-zinc-300 transition"
+          >
+            <Download size={15} />
+            Télécharger
+          </a>
         </div>
       )}
     </div>

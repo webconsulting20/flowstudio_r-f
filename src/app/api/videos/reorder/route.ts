@@ -5,7 +5,7 @@ import { prisma } from "@/lib/prisma";
 
 export async function PUT(request: Request) {
   const session = await getServerSession(authOptions);
-  if (!session || session.user.role !== "admin") {
+  if (!session || session.user.role !== "superadmin") {
     return NextResponse.json({ error: "Non autorisé" }, { status: 403 });
   }
 

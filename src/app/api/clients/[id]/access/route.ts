@@ -6,7 +6,7 @@ import { prisma } from "@/lib/prisma";
 // Get video IDs this client has access to
 export async function GET(_req: Request, { params }: { params: { id: string } }) {
   const session = await getServerSession(authOptions);
-  if (!session || session.user.role !== "admin") {
+  if (!session || session.user.role !== "superadmin") {
     return NextResponse.json({ error: "Non autorisé" }, { status: 403 });
   }
 
@@ -21,7 +21,7 @@ export async function GET(_req: Request, { params }: { params: { id: string } })
 // Replace the full set of video access for this client
 export async function PUT(request: Request, { params }: { params: { id: string } }) {
   const session = await getServerSession(authOptions);
-  if (!session || session.user.role !== "admin") {
+  if (!session || session.user.role !== "superadmin") {
     return NextResponse.json({ error: "Non autorisé" }, { status: 403 });
   }
 

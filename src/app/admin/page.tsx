@@ -193,7 +193,7 @@ export default function AdminPage() {
             </Link>
             <Link href="/admin/clients" className="flex items-center gap-2 px-3 py-2.5 bg-zinc-50 dark:bg-white/[0.03] border border-zinc-200 dark:border-white/[0.06] hover:bg-zinc-100 dark:hover:bg-white/[0.06] text-zinc-600 dark:text-zinc-400 rounded-xl transition">
               <Users size={16} />
-              <span className="hidden sm:inline text-sm">Clients</span>
+              <span className="hidden sm:inline text-sm">Accès</span>
             </Link>
             <button
               onClick={() => { setSelectMode(!selectMode); setSelectedIds(new Set()); }}

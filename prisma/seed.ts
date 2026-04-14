@@ -8,12 +8,12 @@ async function main() {
   const adminPassword = await hash("admin123", 12);
   await prisma.user.upsert({
     where: { email: "admin@flowcloud.fr" },
-    update: {},
+    update: { role: "superadmin" },
     create: {
       email: "admin@flowcloud.fr",
       name: "Admin Flow Cloud",
       password: adminPassword,
-      role: "admin",
+      role: "superadmin",
     },
   });
 

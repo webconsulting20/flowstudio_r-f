@@ -4,15 +4,29 @@ import { useEffect, useState } from "react";
 import { Navbar } from "@/components/navbar";
 import Link from "next/link";
 import {
-  ArrowLeft, Plus, Trash2, Users, Copy, Check, Eye, EyeOff, Settings2,
+  ArrowLeft, Plus, Trash2, Users, Copy, Check, Eye, EyeOff, Settings2, ShieldCheck, Shield, User,
 } from "lucide-react";
 
 interface ClientUser {
   id: string;
   email: string;
   name: string;
+  role: "admin" | "viewer";
   createdAt: string;
 }
+
+const ROLE_LABELS: Record<string, { label: string; color: string; icon: React.ReactNode }> = {
+  admin: {
+    label: "Admin",
+    color: "bg-blue-100 dark:bg-blue-500/10 text-blue-700 dark:text-blue-400",
+    icon: <Shield size={11} />,
+  },
+  viewer: {
+    label: "Visiteur",
+    color: "bg-zinc-100 dark:bg-white/[0.05] text-zinc-600 dark:text-zinc-400",
+    icon: <User size={11} />,
+  },
+};
 
 export default function ClientsPage() {
   const [clients, setClients] = useState<ClientUser[]>([]);
@@ -24,10 +38,11 @@ export default function ClientsPage() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [role, setRole] = useState<"admin" | "viewer">("viewer");
   const [showPassword, setShowPassword] = useState(false);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
-  const [created, setCreated] = useState<{ email: string; password: string } | null>(null);
+  const [created, setCreated] = useState<{ email: string; password: string; role: string } | null>(null);
   const [copied, setCopied] = useState(false);
 
   useEffect(() => {
@@ -59,7 +74,7 @@ export default function ClientsPage() {
     const res = await fetch("/api/clients", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email, name, password }),
+      body: JSON.stringify({ email, name, password, role }),
     });
 
     if (!res.ok) {
@@ -69,10 +84,11 @@ export default function ClientsPage() {
       return;
     }
 
-    setCreated({ email, password });
+    setCreated({ email, password, role });
     setName("");
     setEmail("");
     setPassword("");
+    setRole("viewer");
     setSaving(false);
     setShowForm(false);
     loadClients();
@@ -88,7 +104,8 @@ export default function ClientsPage() {
 
   function copyCredentials() {
     if (!created) return;
-    const text = `Accès FLOW CLOUD\nEmail : ${created.email}\nMot de passe : ${created.password}\nLien : ${window.location.origin}/login`;
+    const roleLabel = created.role === "admin" ? "Admin (téléchargement)" : "Visiteur";
+    const text = `Accès FLOW CLOUD\nEmail : ${created.email}\nMot de passe : ${created.password}\nRôle : ${roleLabel}\nLien : ${window.location.origin}/login`;
     navigator.clipboard.writeText(text);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
@@ -109,8 +126,8 @@ export default function ClientsPage() {
 
         <div className="flex items-center justify-between mb-8">
           <div>
-            <h1 className="text-3xl font-bold tracking-tight text-zinc-900 dark:text-zinc-100">Accès clients</h1>
-            <p className="text-zinc-500 dark:text-zinc-400 mt-1">Créez des comptes pour vos clients</p>
+            <h1 className="text-3xl font-bold tracking-tight text-zinc-900 dark:text-zinc-100">Accès</h1>
+            <p className="text-zinc-500 dark:text-zinc-400 mt-1">Gérez les accès à la plateforme</p>
           </div>
           <button
             onClick={() => {
@@ -134,6 +151,7 @@ export default function ClientsPage() {
                 <div className="text-sm text-zinc-500 dark:text-zinc-400 space-y-1">
                   <p>Email : <span className="text-zinc-900 dark:text-white font-mono">{created.email}</span></p>
                   <p>Mot de passe : <span className="text-zinc-900 dark:text-white font-mono">{created.password}</span></p>
+                  <p>Rôle : <span className="text-zinc-900 dark:text-white">{created.role === "admin" ? "Admin (téléchargement)" : "Visiteur (lecture seule)"}</span></p>
                 </div>
               </div>
               <button
@@ -165,7 +183,7 @@ export default function ClientsPage() {
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                   className="w-full px-4 py-3 bg-zinc-50 dark:bg-white/[0.03] border border-zinc-200 dark:border-white/[0.06] rounded-xl text-zinc-900 dark:text-zinc-100 placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-zinc-300 dark:focus:ring-zinc-600 transition"
-                  placeholder="Nom du client"
+                  placeholder="Nom du compte"
                 />
               </div>
               <div>
@@ -176,8 +194,45 @@ export default function ClientsPage() {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   className="w-full px-4 py-3 bg-zinc-50 dark:bg-white/[0.03] border border-zinc-200 dark:border-white/[0.06] rounded-xl text-zinc-900 dark:text-zinc-100 placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-zinc-300 dark:focus:ring-zinc-600 transition"
-                  placeholder="client@email.com"
+                  placeholder="email@exemple.com"
                 />
+              </div>
+            </div>
+
+            {/* Role selector */}
+            <div>
+              <label className="block text-sm font-medium text-zinc-500 dark:text-zinc-400 mb-2">Type d&apos;accès</label>
+              <div className="grid grid-cols-2 gap-3">
+                <button
+                  type="button"
+                  onClick={() => setRole("viewer")}
+                  className={`flex items-center gap-3 px-4 py-3 rounded-xl border-2 transition text-left ${
+                    role === "viewer"
+                      ? "border-zinc-900 dark:border-white bg-zinc-50 dark:bg-white/[0.05]"
+                      : "border-zinc-200 dark:border-white/[0.06] hover:border-zinc-300 dark:hover:border-white/10"
+                  }`}
+                >
+                  <User size={18} className="text-zinc-500 dark:text-zinc-400 flex-shrink-0" />
+                  <div>
+                    <p className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">Visiteur</p>
+                    <p className="text-xs text-zinc-400">Lecture seule</p>
+                  </div>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setRole("admin")}
+                  className={`flex items-center gap-3 px-4 py-3 rounded-xl border-2 transition text-left ${
+                    role === "admin"
+                      ? "border-blue-500 dark:border-blue-400 bg-blue-50 dark:bg-blue-500/[0.08]"
+                      : "border-zinc-200 dark:border-white/[0.06] hover:border-zinc-300 dark:hover:border-white/10"
+                  }`}
+                >
+                  <Shield size={18} className="text-blue-500 dark:text-blue-400 flex-shrink-0" />
+                  <div>
+                    <p className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">Admin</p>
+                    <p className="text-xs text-zinc-400">Vue + Téléchargement</p>
+                  </div>
+                </button>
               </div>
             </div>
 
@@ -235,6 +290,26 @@ export default function ClientsPage() {
           </form>
         )}
 
+        {/* Super Admin card — pinned */}
+        <div className="mb-4">
+          <p className="text-xs font-semibold text-zinc-400 dark:text-zinc-500 uppercase tracking-widest mb-2 px-1">Super Admin</p>
+          <div className="flex items-center justify-between px-5 py-4 glass rounded-xl border border-amber-200/50 dark:border-amber-500/20 bg-amber-50/50 dark:bg-amber-500/[0.04]">
+            <div className="flex items-center gap-3">
+              <div className="w-8 h-8 rounded-full bg-amber-100 dark:bg-amber-500/20 flex items-center justify-center flex-shrink-0">
+                <ShieldCheck size={16} className="text-amber-600 dark:text-amber-400" />
+              </div>
+              <div>
+                <p className="font-medium text-sm text-zinc-900 dark:text-zinc-100">Admin Flow Cloud</p>
+                <p className="text-xs text-zinc-500 font-mono">admin@flowcloud.fr</p>
+              </div>
+            </div>
+            <span className="flex items-center gap-1.5 px-2.5 py-1 text-xs font-semibold rounded-full bg-amber-100 dark:bg-amber-500/20 text-amber-700 dark:text-amber-400">
+              <ShieldCheck size={11} />
+              Super Admin
+            </span>
+          </div>
+        </div>
+
         {/* Client list */}
         {loading ? (
           <div className="space-y-3">
@@ -245,45 +320,58 @@ export default function ClientsPage() {
         ) : clients.length === 0 ? (
           <div className="text-center py-16 glass rounded-2xl">
             <Users size={40} className="mx-auto text-zinc-300 dark:text-zinc-700 mb-3" />
-            <p className="text-zinc-500">Aucun accès client créé</p>
+            <p className="text-zinc-500">Aucun accès créé</p>
           </div>
         ) : (
-          <div className="space-y-2">
-            {clients.map((client) => (
-              <div
-                key={client.id}
-                className="flex items-center justify-between px-5 py-4 glass rounded-xl"
-              >
-                <div>
-                  <p className="font-medium text-sm text-zinc-900 dark:text-zinc-100">{client.name}</p>
-                  <p className="text-xs text-zinc-500 font-mono">{client.email}</p>
-                </div>
-                <div className="flex items-center gap-3">
-                  <span className="text-xs text-zinc-400 dark:text-zinc-600 hidden sm:inline">
-                    {new Intl.DateTimeFormat("fr-FR", {
-                      day: "numeric",
-                      month: "short",
-                      year: "numeric",
-                    }).format(new Date(client.createdAt))}
-                  </span>
-                  <Link
-                    href={`/admin/clients/${client.id}/access`}
-                    className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 bg-zinc-100 dark:bg-white/[0.05] hover:bg-zinc-200 dark:hover:bg-white/10 rounded-lg transition"
+          <>
+            <p className="text-xs font-semibold text-zinc-400 dark:text-zinc-500 uppercase tracking-widest mb-2 px-1">Comptes</p>
+            <div className="space-y-2">
+              {clients.map((client) => {
+                const roleInfo = ROLE_LABELS[client.role] ?? ROLE_LABELS.viewer;
+                return (
+                  <div
+                    key={client.id}
+                    className="flex items-center justify-between px-5 py-4 glass rounded-xl"
                   >
-                    <Settings2 size={13} />
-                    Accès vidéos
-                  </Link>
-                  <button
-                    onClick={() => handleDelete(client.id, client.name)}
-                    disabled={deleting === client.id}
-                    className="p-2 text-zinc-400 dark:text-zinc-600 hover:text-red-500 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-500/10 rounded-lg transition disabled:opacity-50"
-                  >
-                    <Trash2 size={14} />
-                  </button>
-                </div>
-              </div>
-            ))}
-          </div>
+                    <div className="flex items-center gap-3">
+                      <div>
+                        <p className="font-medium text-sm text-zinc-900 dark:text-zinc-100">{client.name}</p>
+                        <p className="text-xs text-zinc-500 font-mono">{client.email}</p>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      {/* Role badge */}
+                      <span className={`hidden sm:flex items-center gap-1.5 px-2.5 py-1 text-xs font-semibold rounded-full ${roleInfo.color}`}>
+                        {roleInfo.icon}
+                        {roleInfo.label}
+                      </span>
+                      <span className="text-xs text-zinc-400 dark:text-zinc-600 hidden md:inline">
+                        {new Intl.DateTimeFormat("fr-FR", {
+                          day: "numeric",
+                          month: "short",
+                          year: "numeric",
+                        }).format(new Date(client.createdAt))}
+                      </span>
+                      <Link
+                        href={`/admin/clients/${client.id}/access`}
+                        className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 bg-zinc-100 dark:bg-white/[0.05] hover:bg-zinc-200 dark:hover:bg-white/10 rounded-lg transition"
+                      >
+                        <Settings2 size={13} />
+                        Accès vidéos
+                      </Link>
+                      <button
+                        onClick={() => handleDelete(client.id, client.name)}
+                        disabled={deleting === client.id}
+                        className="p-2 text-zinc-400 dark:text-zinc-600 hover:text-red-500 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-500/10 rounded-lg transition disabled:opacity-50"
+                      >
+                        <Trash2 size={14} />
+                      </button>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </>
         )}
       </main>
     </div>

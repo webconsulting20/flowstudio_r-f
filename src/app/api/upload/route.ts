@@ -7,7 +7,7 @@ import { join } from "path";
 
 export async function POST(request: Request) {
   const session = await getServerSession(authOptions);
-  if (!session || session.user.role !== "admin") {
+  if (!session || session.user.role !== "superadmin") {
     return NextResponse.json({ error: "Non autorisé" }, { status: 403 });
   }
 

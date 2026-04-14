@@ -4,8 +4,12 @@ import { Navbar } from "@/components/navbar";
 import { getCategoryLabel, isMarketingDigital, isSiteWeb, getSubcategoryLabel } from "@/lib/categories";
 import { BackButton } from "@/components/back-button";
 import { VideoDetailClient } from "./video-detail-client";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
 
 export default async function VideoDetailPage({ params }: { params: { id: string } }) {
+  const session = await getServerSession(authOptions);
+  const userRole = (session?.user as any)?.role ?? "viewer";
   const video = await prisma.video.findUnique({ where: { id: params.id } });
 
   if (!video) notFound();
@@ -54,6 +58,7 @@ export default async function VideoDetailPage({ params }: { params: { id: string
                 ? allVideoUrls
                 : [{ url: video.videoUrl, title: video.title }]
             }
+            canDownload={userRole === "admin" || userRole === "superadmin"}
           />
         ) : null}
 

@@ -13,7 +13,7 @@ model User {
   email       String               @unique
   password    String
   name        String
-  role        String               @default("viewer") // "admin" | "viewer"
+  role        String               @default("viewer") // "superadmin" | "admin" | "viewer"
   createdAt   DateTime             @default(now())
   videoAccess ClientVideoAccess[]
 }

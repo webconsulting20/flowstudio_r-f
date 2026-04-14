@@ -52,9 +52,13 @@ export function FileUpload({
 
       if (!sigRes.ok) {
         // Fallback : upload via notre API (dev local)
+        console.warn(`[FileUpload] Signature failed: ${sigRes.status} — falling back to API proxy (slow)`);
+        const errText = await sigRes.text();
+        console.warn(`[FileUpload] Signature error:`, errText);
         await uploadViaApi(file);
         return;
       }
+      console.log("[FileUpload] ✅ Signature OK — uploading directly to Cloudinary");
 
       const { signature, timestamp, cloudName, apiKey, folder: cloudFolder } = await sigRes.json();
 

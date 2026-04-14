@@ -103,40 +103,23 @@ export function FileUpload({
 
   async function uploadChunked(file: File, opts: { signature: string; timestamp: number; cloudName: string; apiKey: string; folder: string; resourceType: string }) {
     const { signature, timestamp, cloudName, apiKey, folder, resourceType } = opts;
-    const CHUNK_SIZE = 20 * 1024 * 1024; // 20MB par chunk
+    const CHUNK_SIZE = 50 * 1024 * 1024; // 50MB par chunk — moins d'aller-retours
     const totalChunks = Math.ceil(file.size / CHUNK_SIZE);
     const uniqueUploadId = `flowstudio-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
     const url = `https://api.cloudinary.com/v1_1/${cloudName}/${resourceType}/upload`;
-
-    let uploadedBytes = 0;
 
     for (let i = 0; i < totalChunks; i++) {
       const start = i * CHUNK_SIZE;
       const end = Math.min(start + CHUNK_SIZE, file.size);
       const chunk = file.slice(start, end);
 
+      // Une seule signature réutilisée pour tous les chunks
       const formData = new FormData();
       formData.append("file", chunk);
       formData.append("api_key", apiKey);
+      formData.append("signature", signature);
+      formData.append("timestamp", String(timestamp));
       formData.append("folder", folder);
-
-      // Seulement sur le dernier chunk on signe
-      if (i === totalChunks - 1) {
-        formData.append("signature", signature);
-        formData.append("timestamp", String(timestamp));
-      } else {
-        // Chunks intermédiaires : re-signer
-        const reSign = await fetch("/api/upload-signature", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ folder: folder.replace("flowstudio/", "") }),
-        });
-        if (reSign.ok) {
-          const s = await reSign.json();
-          formData.append("signature", s.signature);
-          formData.append("timestamp", String(s.timestamp));
-        }
-      }
 
       await new Promise<void>((resolve, reject) => {
         const xhr = new XMLHttpRequest();
@@ -146,30 +129,29 @@ export function FileUpload({
 
         xhr.upload.onprogress = (e) => {
           if (e.lengthComputable) {
-            const chunkProgress = (uploadedBytes + e.loaded) / file.size * 100;
-            setProgress(Math.round(chunkProgress));
+            const overall = (start + e.loaded) / file.size * 100;
+            setProgress(Math.round(overall));
           }
         };
 
         xhr.onload = () => {
-          uploadedBytes = end;
-          setProgress(Math.round(uploadedBytes / file.size * 100));
           if (xhr.status === 200) {
             const result = JSON.parse(xhr.responseText);
+            setProgress(100);
             onUploaded(result.secure_url);
             setTimeout(() => setUploading(false), 500);
             resolve();
           } else if (xhr.status === 206) {
-            // Chunk accepté, on continue
+            setProgress(Math.round(end / file.size * 100));
             resolve();
           } else {
-            alert("Erreur upload chunk " + (i + 1) + " : " + xhr.status);
+            alert("Erreur upload : " + xhr.status);
             setUploading(false);
             setProgress(0);
             reject();
           }
         };
-        xhr.onerror = () => { alert("Erreur réseau chunk " + (i + 1)); setUploading(false); setProgress(0); reject(); };
+        xhr.onerror = () => { alert("Erreur réseau"); setUploading(false); setProgress(0); reject(); };
         xhr.send(formData);
       });
     }

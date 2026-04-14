@@ -13,7 +13,7 @@ interface SiteSettings {
 
 export function Navbar() {
   const { data: session } = useSession();
-  const isAdmin = session?.user?.role === "admin";
+  const isAdmin = session?.user?.role === "admin" || session?.user?.role === "superadmin";
   const [settings, setSettings] = useState<SiteSettings>({ siteTitle: "Flow Studio", logoUrl: "" });
   const { theme, setTheme } = useTheme();
   const [mounted, setMounted] = useState(false);

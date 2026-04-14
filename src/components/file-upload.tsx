@@ -42,7 +42,6 @@ export function FileUpload({
     setProgress(0);
 
     try {
-      // 1. Obtenir la signature Cloudinary depuis notre API
       const folder = type === "video" ? "videos" : "thumbnails";
       const sigRes = await fetch("/api/upload-signature", {
         method: "POST",
@@ -51,58 +50,128 @@ export function FileUpload({
       });
 
       if (!sigRes.ok) {
-        // Fallback : upload via notre API (dev local)
         await uploadViaApi(file);
         return;
       }
 
       const { signature, timestamp, cloudName, apiKey, folder: cloudFolder } = await sigRes.json();
-
-      // 2. Upload directement vers Cloudinary depuis le navigateur
       const isVideo = type === "video" || file.type.startsWith("video/");
       const resourceType = isVideo ? "video" : "image";
 
-      const formData = new FormData();
-      formData.append("file", file);
-      formData.append("signature", signature);
-      formData.append("timestamp", String(timestamp));
-      formData.append("api_key", apiKey);
-      formData.append("folder", cloudFolder);
-
-      const xhr = new XMLHttpRequest();
-      xhr.open("POST", `https://api.cloudinary.com/v1_1/${cloudName}/${resourceType}/upload`);
-
-      xhr.upload.onprogress = (e) => {
-        if (e.lengthComputable) {
-          const pct = Math.round((e.loaded / e.total) * 100);
-          setProgress(pct);
-        }
-      };
-
-      xhr.onload = () => {
-        if (xhr.status === 200) {
-          const result = JSON.parse(xhr.responseText);
-          setProgress(100);
-          onUploaded(result.secure_url);
-          setTimeout(() => setUploading(false), 500);
-        } else {
-          alert("Erreur lors de l'upload vers Cloudinary");
-          setUploading(false);
-          setProgress(0);
-        }
-      };
-
-      xhr.onerror = () => {
-        alert("Erreur réseau lors de l'upload");
-        setUploading(false);
-        setProgress(0);
-      };
-
-      xhr.send(formData);
+      // Chunked upload pour les vidéos (chunks de 20MB)
+      if (isVideo && file.size > 20 * 1024 * 1024) {
+        await uploadChunked(file, { signature, timestamp, cloudName, apiKey, folder: cloudFolder, resourceType });
+      } else {
+        await uploadDirect(file, { signature, timestamp, cloudName, apiKey, folder: cloudFolder, resourceType });
+      }
     } catch {
       alert("Erreur lors de l'upload");
       setUploading(false);
       setProgress(0);
+    }
+  }
+
+  async function uploadDirect(file: File, opts: { signature: string; timestamp: number; cloudName: string; apiKey: string; folder: string; resourceType: string }) {
+    const { signature, timestamp, cloudName, apiKey, folder, resourceType } = opts;
+    const formData = new FormData();
+    formData.append("file", file);
+    formData.append("signature", signature);
+    formData.append("timestamp", String(timestamp));
+    formData.append("api_key", apiKey);
+    formData.append("folder", folder);
+
+    const xhr = new XMLHttpRequest();
+    xhr.open("POST", `https://api.cloudinary.com/v1_1/${cloudName}/${resourceType}/upload`);
+    xhr.upload.onprogress = (e) => {
+      if (e.lengthComputable) setProgress(Math.round((e.loaded / e.total) * 100));
+    };
+    xhr.onload = () => {
+      if (xhr.status === 200) {
+        const result = JSON.parse(xhr.responseText);
+        setProgress(100);
+        onUploaded(result.secure_url);
+        setTimeout(() => setUploading(false), 500);
+      } else {
+        alert("Erreur Cloudinary : " + xhr.status);
+        setUploading(false);
+        setProgress(0);
+      }
+    };
+    xhr.onerror = () => { alert("Erreur réseau"); setUploading(false); setProgress(0); };
+    xhr.send(formData);
+  }
+
+  async function uploadChunked(file: File, opts: { signature: string; timestamp: number; cloudName: string; apiKey: string; folder: string; resourceType: string }) {
+    const { signature, timestamp, cloudName, apiKey, folder, resourceType } = opts;
+    const CHUNK_SIZE = 20 * 1024 * 1024; // 20MB par chunk
+    const totalChunks = Math.ceil(file.size / CHUNK_SIZE);
+    const uniqueUploadId = `flowstudio-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+    const url = `https://api.cloudinary.com/v1_1/${cloudName}/${resourceType}/upload`;
+
+    let uploadedBytes = 0;
+
+    for (let i = 0; i < totalChunks; i++) {
+      const start = i * CHUNK_SIZE;
+      const end = Math.min(start + CHUNK_SIZE, file.size);
+      const chunk = file.slice(start, end);
+
+      const formData = new FormData();
+      formData.append("file", chunk);
+      formData.append("api_key", apiKey);
+      formData.append("folder", folder);
+
+      // Seulement sur le dernier chunk on signe
+      if (i === totalChunks - 1) {
+        formData.append("signature", signature);
+        formData.append("timestamp", String(timestamp));
+      } else {
+        // Chunks intermédiaires : re-signer
+        const reSign = await fetch("/api/upload-signature", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ folder: folder.replace("flowstudio/", "") }),
+        });
+        if (reSign.ok) {
+          const s = await reSign.json();
+          formData.append("signature", s.signature);
+          formData.append("timestamp", String(s.timestamp));
+        }
+      }
+
+      await new Promise<void>((resolve, reject) => {
+        const xhr = new XMLHttpRequest();
+        xhr.open("POST", url);
+        xhr.setRequestHeader("X-Unique-Upload-Id", uniqueUploadId);
+        xhr.setRequestHeader("Content-Range", `bytes ${start}-${end - 1}/${file.size}`);
+
+        xhr.upload.onprogress = (e) => {
+          if (e.lengthComputable) {
+            const chunkProgress = (uploadedBytes + e.loaded) / file.size * 100;
+            setProgress(Math.round(chunkProgress));
+          }
+        };
+
+        xhr.onload = () => {
+          uploadedBytes = end;
+          setProgress(Math.round(uploadedBytes / file.size * 100));
+          if (xhr.status === 200) {
+            const result = JSON.parse(xhr.responseText);
+            onUploaded(result.secure_url);
+            setTimeout(() => setUploading(false), 500);
+            resolve();
+          } else if (xhr.status === 206) {
+            // Chunk accepté, on continue
+            resolve();
+          } else {
+            alert("Erreur upload chunk " + (i + 1) + " : " + xhr.status);
+            setUploading(false);
+            setProgress(0);
+            reject();
+          }
+        };
+        xhr.onerror = () => { alert("Erreur réseau chunk " + (i + 1)); setUploading(false); setProgress(0); reject(); };
+        xhr.send(formData);
+      });
     }
   }
 

@@ -10,7 +10,7 @@ import Link from "next/link";
 import {
   Plus, Pencil, Trash2, Video, Play, X,
   Users, Settings, Image as ImageIcon, Globe, Search, LayoutGrid, List,
-  CheckSquare, Square, ArrowUpToLine, ArrowDownToLine,
+  CheckSquare, Square, ArrowUpToLine, ArrowDownToLine, ChevronUp, ChevronDown,
 } from "lucide-react";
 
 interface VideoItem {
@@ -117,6 +117,36 @@ export default function AdminPage() {
     setVideos((prev) => prev.filter((v) => !selectedIds.has(v.id)));
     setSelectedIds(new Set());
     setSelectMode(false);
+  }
+
+  async function moveSelectedUp() {
+    if (selectedIds.size === 0) return;
+    const newVideos = [...videos];
+    // Parcourir du haut vers le bas : chaque item sélectionné remonte d'une position
+    for (let i = 1; i < newVideos.length; i++) {
+      if (selectedIds.has(newVideos[i].id) && !selectedIds.has(newVideos[i - 1].id)) {
+        [newVideos[i], newVideos[i - 1]] = [newVideos[i - 1], newVideos[i]];
+      }
+    }
+    setVideos(newVideos);
+    setSaving(true);
+    await fetch("/api/videos/reorder", { method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ orderedIds: newVideos.map((v) => v.id) }) });
+    setSaving(false);
+  }
+
+  async function moveSelectedDown() {
+    if (selectedIds.size === 0) return;
+    const newVideos = [...videos];
+    // Parcourir du bas vers le haut : chaque item sélectionné descend d'une position
+    for (let i = newVideos.length - 2; i >= 0; i--) {
+      if (selectedIds.has(newVideos[i].id) && !selectedIds.has(newVideos[i + 1].id)) {
+        [newVideos[i], newVideos[i + 1]] = [newVideos[i + 1], newVideos[i]];
+      }
+    }
+    setVideos(newVideos);
+    setSaving(true);
+    await fetch("/api/videos/reorder", { method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ orderedIds: newVideos.map((v) => v.id) }) });
+    setSaving(false);
   }
 
   async function moveSelectedToTop() {
@@ -431,10 +461,16 @@ export default function AdminPage() {
           <div className="w-px h-5 bg-white/[0.1]" />
           <span className="text-sm text-zinc-400 px-1">{selectedIds.size} sélectionné{selectedIds.size > 1 ? "s" : ""}</span>
           <div className="w-px h-5 bg-white/[0.1]" />
-          <button onClick={moveSelectedToTop} disabled={selectedIds.size === 0} className="flex items-center gap-1.5 px-3 py-1.5 text-sm text-zinc-300 hover:text-white disabled:opacity-40 transition">
+          <button onClick={moveSelectedToTop} disabled={selectedIds.size === 0} className="flex items-center gap-1.5 px-3 py-1.5 text-sm text-zinc-300 hover:text-white disabled:opacity-40 transition" title="Mettre en premier">
             <ArrowUpToLine size={15} /> En haut
           </button>
-          <button onClick={moveSelectedToBottom} disabled={selectedIds.size === 0} className="flex items-center gap-1.5 px-3 py-1.5 text-sm text-zinc-300 hover:text-white disabled:opacity-40 transition">
+          <button onClick={moveSelectedUp} disabled={selectedIds.size === 0} className="flex items-center gap-1.5 px-3 py-1.5 text-sm text-zinc-300 hover:text-white disabled:opacity-40 transition" title="Monter d'une position">
+            <ChevronUp size={15} /> +1
+          </button>
+          <button onClick={moveSelectedDown} disabled={selectedIds.size === 0} className="flex items-center gap-1.5 px-3 py-1.5 text-sm text-zinc-300 hover:text-white disabled:opacity-40 transition" title="Descendre d'une position">
+            <ChevronDown size={15} /> -1
+          </button>
+          <button onClick={moveSelectedToBottom} disabled={selectedIds.size === 0} className="flex items-center gap-1.5 px-3 py-1.5 text-sm text-zinc-300 hover:text-white disabled:opacity-40 transition" title="Mettre en dernier">
             <ArrowDownToLine size={15} /> En bas
           </button>
           <div className="w-px h-5 bg-white/[0.1]" />

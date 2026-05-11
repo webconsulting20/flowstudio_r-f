@@ -50,6 +50,8 @@ export function VideoForm({ initialData, videoId }: VideoFormProps) {
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
   const [showVideoPreview, setShowVideoPreview] = useState(false);
+  const [dragIndex, setDragIndex] = useState<number | null>(null);
+  const [dragOverIndex, setDragOverIndex] = useState<number | null>(null);
   // Main video title stored as first entry in videoUrls
   const parsedVideoUrls: ExtraVideo[] = JSON.parse(form.videoUrls || "[]");
   const [mainVideoTitle, setMainVideoTitle] = useState(() => {
@@ -99,7 +101,7 @@ export function VideoForm({ initialData, videoId }: VideoFormProps) {
   }
 
   function addImage(url: string) {
-    const maxImages = 4;
+    const maxImages = isMarketing ? 12 : 4;
     if (images.length >= maxImages) return;
     updateImages([...images, url]);
   }
@@ -151,6 +153,35 @@ export function VideoForm({ initialData, videoId }: VideoFormProps) {
     const newImages = [...images];
     [newImages[index], newImages[newIndex]] = [newImages[newIndex], newImages[index]];
     updateImages(newImages);
+  }
+
+  function handleDragStart(index: number) {
+    setDragIndex(index);
+  }
+
+  function handleDragOver(e: React.DragEvent, index: number) {
+    e.preventDefault();
+    if (index !== dragOverIndex) setDragOverIndex(index);
+  }
+
+  function handleDrop(e: React.DragEvent, index: number) {
+    e.preventDefault();
+    if (dragIndex === null || dragIndex === index) {
+      setDragIndex(null);
+      setDragOverIndex(null);
+      return;
+    }
+    const newImages = [...images];
+    const [moved] = newImages.splice(dragIndex, 1);
+    newImages.splice(index, 0, moved);
+    updateImages(newImages);
+    setDragIndex(null);
+    setDragOverIndex(null);
+  }
+
+  function handleDragEnd() {
+    setDragIndex(null);
+    setDragOverIndex(null);
   }
 
   async function handleSubmit(e: React.FormEvent) {
@@ -316,38 +347,34 @@ export function VideoForm({ initialData, videoId }: VideoFormProps) {
         {isMarketing ? (
           <div>
             <label className="block text-sm font-medium text-zinc-400 mb-3">
-              Images Instagram ({images.length}/4) * <span className="text-zinc-500">(utilisez les flèches pour réorganiser)</span>
+              Posts Instagram ({images.length}/12) * <span className="text-zinc-500">(glissez pour réorganiser)</span>
             </label>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
               {images.map((url, i) => (
-                <div key={i} className={`relative aspect-[4/5] rounded-xl overflow-hidden border ${accentColor?.border ?? "border-zinc-200 dark:border-white/10"} bg-zinc-50 dark:bg-white/[0.03] group`}>
-                  <img src={url} alt={`Image ${i + 1}`} className="absolute inset-0 w-full h-full object-cover" />
+                <div
+                  key={i}
+                  draggable
+                  onDragStart={() => handleDragStart(i)}
+                  onDragOver={(e) => handleDragOver(e, i)}
+                  onDrop={(e) => handleDrop(e, i)}
+                  onDragEnd={handleDragEnd}
+                  className={`relative aspect-[4/5] rounded-xl overflow-hidden border-2 bg-zinc-50 dark:bg-white/[0.03] group cursor-grab active:cursor-grabbing select-none transition-all ${
+                    dragIndex === i
+                      ? "opacity-40 scale-95"
+                      : dragOverIndex === i
+                      ? "border-zinc-500 dark:border-zinc-300 scale-[1.02]"
+                      : accentColor?.border
+                      ? accentColor.border.replace("border-", "border-")
+                      : "border-zinc-200 dark:border-white/10"
+                  }`}
+                >
+                  <img src={url} alt={`Image ${i + 1}`} className="absolute inset-0 w-full h-full object-cover pointer-events-none" />
                   {/* Position badge */}
                   <span className="absolute top-2 left-2 px-2 py-0.5 bg-black/60 rounded-full text-white text-xs font-medium">
                     {i + 1}
                   </span>
-                  {/* Action buttons */}
-                  <div className="absolute top-2 right-2 flex gap-1">
-                    {i > 0 && (
-                      <button
-                        type="button"
-                        onClick={() => moveImage(i, -1)}
-                        className="p-1 bg-black/60 rounded-full text-white hover:bg-zinc-600 transition"
-                        title="Déplacer avant"
-                      >
-                        <ChevronLeft size={14} />
-                      </button>
-                    )}
-                    {i < images.length - 1 && (
-                      <button
-                        type="button"
-                        onClick={() => moveImage(i, 1)}
-                        className="p-1 bg-black/60 rounded-full text-white hover:bg-zinc-600 transition"
-                        title="Déplacer après"
-                      >
-                        <ChevronRight size={14} />
-                      </button>
-                    )}
+                  {/* Delete button */}
+                  <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
                     <button
                       type="button"
                       onClick={() => removeImage(i)}
@@ -356,9 +383,13 @@ export function VideoForm({ initialData, videoId }: VideoFormProps) {
                       <X size={14} />
                     </button>
                   </div>
+                  {/* Drag hint */}
+                  <div className="absolute bottom-2 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity">
+                    <span className="px-2 py-0.5 bg-black/60 rounded-full text-white text-xs">glisser</span>
+                  </div>
                 </div>
               ))}
-              {images.length < 4 && (
+              {images.length < 12 && (
                 <ImageUploadSlot
                   onUploaded={addImage}
                   borderClass={accentColor?.border ?? "border-zinc-200 dark:border-white/10"}
